@@ -12,7 +12,7 @@ BASE = ../..
 INCLUDE = -I$(BASE)/include  -I$(BASE)
 CPPFLAGS += $(INCLUDE)
 CFLAGS += $(INCLUDE)
-LDFLAGS += -L$(BASE)/$(LIB_SO) -l$(LIB_NAME)
+LDFLAGS += -L$(BASE) -l$(LIB_NAME)
 
 # Mac OSX options
 ifeq ($(UNAME), Darwin)
