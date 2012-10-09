@@ -2,7 +2,10 @@
 
 class spinning_barrier {
  public:
-	spinning_barrier (unsigned int n) : n_ (n), nwait_ (0), step_(0) {}
+	spinning_barrier (unsigned int n) : n_ (n) {
+		nwait_ = 0;
+		step_ = 0;
+	}
 
 	bool wait() {
 		unsigned int step = step_.load ();
