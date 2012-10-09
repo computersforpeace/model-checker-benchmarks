@@ -1,0 +1,89 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ARRAY_LOCK_FREE_Q_DEFAULT_SIZE	array_lock_free_queue.h	45;"	d
+ARRAY_LOCK_FREE_Q_DEFAULT_SIZE	array_lock_free_queue_single_producer.h	49;"	d
+ARRAY_LOCK_FREE_Q_KEEP_REAL_SIZE	array_lock_free_queue.h	50;"	d
+ARRAY_LOCK_FREE_Q_KEEP_REAL_SIZE	array_lock_free_queue_single_producer.h	54;"	d
+ArrayLockFreeQueue	array_lock_free_queue.h	/^class ArrayLockFreeQueue$/;"	c
+ArrayLockFreeQueue	array_lock_free_queue_impl.h	/^ArrayLockFreeQueue<ELEM_T, Q_SIZE>::ArrayLockFreeQueue() :$/;"	f	class:ArrayLockFreeQueue
+ArrayLockFreeQueueSingleProducer	array_lock_free_queue_single_producer.h	/^class ArrayLockFreeQueueSingleProducer$/;"	c
+ArrayLockFreeQueueSingleProducer	array_lock_free_queue_single_producer_impl.h	/^ArrayLockFreeQueueSingleProducer<ELEM_T, Q_SIZE>::ArrayLockFreeQueueSingleProducer() :$/;"	f	class:ArrayLockFreeQueueSingleProducer
+AtomicAdd	atomic_ops.h	51;"	d
+AtomicAdd	atomic_ops.h	87;"	d
+AtomicSub	atomic_ops.h	55;"	d
+AtomicSub	atomic_ops.h	91;"	d
+BLOCKING_QUEUE_DEFAULT_MAX_SIZE	g_blocking_queue.h	49;"	d
+BLOCKING_Q_INCLUDE	makefile	/^BLOCKING_Q_INCLUDE = \\$/;"	m
+BlockingQueue	g_blocking_queue.h	/^class BlockingQueue$/;"	c
+BlockingQueue	g_blocking_queue_impl.h	/^BlockingQueue<T>::BlockingQueue(std::size_t a_maxSize) :$/;"	f	class:BlockingQueue
+CAS	atomic_ops.h	60;"	d
+CAS	atomic_ops.h	96;"	d
+CASVal	atomic_ops.h	101;"	d
+CASVal	atomic_ops.h	65;"	d
+CC	makefile	/^CC      = g++$/;"	m
+CFLAGS_GTHREAD	makefile	/^CFLAGS_GTHREAD = `pkg-config gthread-2.0`$/;"	m
+IsEmpty	g_blocking_queue_impl.h	/^bool BlockingQueue<T>::IsEmpty()$/;"	f	class:BlockingQueue
+LDFLAGS_GTHREAD	makefile	/^LDFLAGS_GTHREAD = `pkg-config --libs gthread-2.0`$/;"	m
+LOCK_FREE_Q_INCLUDE	makefile	/^LOCK_FREE_Q_INCLUDE = \\$/;"	m
+LOCK_FREE_SINGLE_PRODUCER_Q_INCLUDE	makefile	/^LOCK_FREE_SINGLE_PRODUCER_Q_INCLUDE = \\$/;"	m
+NANOSECONDS_PER_SECOND	g_blocking_queue_impl.h	47;"	d
+N_CONSUMERS	test_blocking_q.cpp	17;"	d	file:
+N_CONSUMERS	test_lock_free_q.cpp	17;"	d	file:
+N_CONSUMERS	test_lock_free_single_producer_q.cpp	13;"	d	file:
+N_ITERATIONS	test_blocking_q.cpp	21;"	d	file:
+N_ITERATIONS	test_lock_free_q.cpp	21;"	d	file:
+N_ITERATIONS	test_lock_free_single_producer_q.cpp	17;"	d	file:
+N_PRODUCERS	test_blocking_q.cpp	13;"	d	file:
+N_PRODUCERS	test_lock_free_q.cpp	13;"	d	file:
+Pop	g_blocking_queue_impl.h	/^void BlockingQueue<T>::Pop(T &out_data)$/;"	f	class:BlockingQueue
+Push	g_blocking_queue_impl.h	/^bool BlockingQueue<T>::Push(const T &a_elem)$/;"	f	class:BlockingQueue
+QUEUE_SIZE	test_blocking_q.cpp	25;"	d	file:
+QUEUE_SIZE	test_lock_free_q.cpp	25;"	d	file:
+QUEUE_SIZE	test_lock_free_single_producer_q.cpp	21;"	d	file:
+SHARED_INCLUDE	makefile	/^SHARED_INCLUDE = \\$/;"	m
+TestBlockingQueue	test_blocking_q.cpp	/^void TestBlockingQueue()$/;"	f
+TestLockFreeQueue	test_lock_free_q.cpp	/^void TestLockFreeQueue()$/;"	f
+TestLockFreeQueue	test_lock_free_single_producer_q.cpp	/^void TestLockFreeQueue()$/;"	f
+TimedWaitPop	g_blocking_queue_impl.h	/^bool BlockingQueue<T>::TimedWaitPop(T &data, glong microsecs)$/;"	f	class:BlockingQueue
+TryPop	g_blocking_queue_impl.h	/^bool BlockingQueue<T>::TryPop(T &out_data)$/;"	f	class:BlockingQueue
+TryPush	g_blocking_queue_impl.h	/^bool BlockingQueue<T>::TryPush(const T &a_elem)$/;"	f	class:BlockingQueue
+_GBLOCKINGQUEUEIMPL_H_	g_blocking_queue_impl.h	43;"	d
+_GBLOCKINGQUEUE_H_	g_blocking_queue.h	43;"	d
+__ARRAY_LOCK_FREE_QUEUE_H__	array_lock_free_queue.h	40;"	d
+__ARRAY_LOCK_FREE_QUEUE_IMPL_H__	array_lock_free_queue_impl.h	40;"	d
+__ARRAY_LOCK_FREE_QUEUE_SINGLE_PRODUCER_H__	array_lock_free_queue_single_producer.h	44;"	d
+__ARRAY_LOCK_FREE_QUEUE_SINGLE_PRODUCER_IMPL_H__	array_lock_free_queue_single_producer_impl.h	40;"	d
+__ATOMIC_OPS_H	atomic_ops.h	41;"	d
+atomic32	atomic_ops.h	/^typedef atomic_uint atomic32;$/;"	t
+atomic32	atomic_ops.h	/^typedef volatile uint32 atomic32;$/;"	t
+countToIndex	array_lock_free_queue_impl.h	/^uint32_t ArrayLockFreeQueue<ELEM_T, Q_SIZE>::countToIndex(uint32_t a_count)$/;"	f	class:ArrayLockFreeQueue
+countToIndex	array_lock_free_queue_single_producer_impl.h	/^uint32_t ArrayLockFreeQueueSingleProducer<ELEM_T, Q_SIZE>::countToIndex(uint32_t a_count)$/;"	f	class:ArrayLockFreeQueueSingleProducer
+m_cond	g_blocking_queue.h	/^    GCond*  m_cond;$/;"	m	class:BlockingQueue
+m_count	array_lock_free_queue.h	/^    atomic32 m_count;$/;"	m	class:ArrayLockFreeQueue
+m_count	array_lock_free_queue_single_producer.h	/^    atomic32 m_count;$/;"	m	class:ArrayLockFreeQueueSingleProducer
+m_maximumReadIndex	array_lock_free_queue.h	/^    atomic32 m_maximumReadIndex;$/;"	m	class:ArrayLockFreeQueue
+m_maximumSize	g_blocking_queue.h	/^    std::size_t m_maximumSize;$/;"	m	class:BlockingQueue
+m_mutex	g_blocking_queue.h	/^    GMutex* m_mutex;$/;"	m	class:BlockingQueue
+m_readIndex	array_lock_free_queue.h	/^    atomic32 m_readIndex;$/;"	m	class:ArrayLockFreeQueue
+m_readIndex	array_lock_free_queue_single_producer.h	/^    atomic32 m_readIndex;$/;"	m	class:ArrayLockFreeQueueSingleProducer
+m_theQueue	array_lock_free_queue.h	/^    ELEM_T m_theQueue[Q_SIZE];$/;"	m	class:ArrayLockFreeQueue
+m_theQueue	array_lock_free_queue_single_producer.h	/^    ELEM_T m_theQueue[Q_SIZE];$/;"	m	class:ArrayLockFreeQueueSingleProducer
+m_theQueue	g_blocking_queue.h	/^    std::queue<T> m_theQueue;$/;"	m	class:BlockingQueue
+m_writeIndex	array_lock_free_queue.h	/^    atomic32 m_writeIndex;$/;"	m	class:ArrayLockFreeQueue
+m_writeIndex	array_lock_free_queue_single_producer.h	/^    atomic32 m_writeIndex;$/;"	m	class:ArrayLockFreeQueueSingleProducer
+main	test_blocking_q.cpp	/^int main(int \/*argc*\/, char** \/*argv*\/)$/;"	f
+main	test_lock_free_q.cpp	/^int main(int \/*argc*\/, char** \/*argv*\/)$/;"	f
+main	test_lock_free_single_producer_q.cpp	/^int main(int \/*argc*\/, char** \/*argv*\/)$/;"	f
+pop	array_lock_free_queue_impl.h	/^bool ArrayLockFreeQueue<ELEM_T, Q_SIZE>::pop(ELEM_T &a_data)$/;"	f	class:ArrayLockFreeQueue
+pop	array_lock_free_queue_single_producer_impl.h	/^bool ArrayLockFreeQueueSingleProducer<ELEM_T, Q_SIZE>::pop(ELEM_T &a_data)$/;"	f	class:ArrayLockFreeQueueSingleProducer
+push	array_lock_free_queue_impl.h	/^bool ArrayLockFreeQueue<ELEM_T, Q_SIZE>::push(const ELEM_T &a_data)$/;"	f	class:ArrayLockFreeQueue
+push	array_lock_free_queue_single_producer_impl.h	/^bool ArrayLockFreeQueueSingleProducer<ELEM_T, Q_SIZE>::push(const ELEM_T &a_data)$/;"	f	class:ArrayLockFreeQueueSingleProducer
+size	array_lock_free_queue_impl.h	/^uint32_t ArrayLockFreeQueue<ELEM_T, Q_SIZE>::size()$/;"	f	class:ArrayLockFreeQueue
+size	array_lock_free_queue_single_producer_impl.h	/^uint32_t ArrayLockFreeQueueSingleProducer<ELEM_T, Q_SIZE>::size()$/;"	f	class:ArrayLockFreeQueueSingleProducer
+~ArrayLockFreeQueue	array_lock_free_queue_impl.h	/^ArrayLockFreeQueue<ELEM_T, Q_SIZE>::~ArrayLockFreeQueue()$/;"	f	class:ArrayLockFreeQueue
+~ArrayLockFreeQueueSingleProducer	array_lock_free_queue_single_producer_impl.h	/^ArrayLockFreeQueueSingleProducer<ELEM_T, Q_SIZE>::~ArrayLockFreeQueueSingleProducer()$/;"	f	class:ArrayLockFreeQueueSingleProducer
+~BlockingQueue	g_blocking_queue_impl.h	/^BlockingQueue<T>::~BlockingQueue()$/;"	f	class:BlockingQueue
