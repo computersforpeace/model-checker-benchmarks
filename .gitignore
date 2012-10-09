@@ -1,0 +1,9 @@
+# generic types
+*.o
+.*.swp
+*.swo
+*.so
+*~
+
+# files in this directory
+/tags
