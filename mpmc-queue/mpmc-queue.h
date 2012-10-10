@@ -36,7 +36,7 @@ public:
 			if ( wr == rd ) // empty
 				return false;
 
-			if ( m_rdwr.compare_exchange(rdwr,rdwr+(1<<16),mo_acq_rel) )
+			if ( m_rdwr.compare_exchange_weak(rdwr,rdwr+(1<<16),mo_acq_rel) )
 				break;
 		}
 
@@ -67,7 +67,7 @@ public:
 			if ( wr == ((rd + t_size)&0xFFFF) ) // full
 				return NULL;
 
-			if ( m_rdwr.compare_exchange(rdwr,(rd<<16) | ((wr+1)&0xFFFF),mo_acq_rel) )
+			if ( m_rdwr.compare_exchange_weak(rdwr,(rd<<16) | ((wr+1)&0xFFFF),mo_acq_rel) )
 				break;
 		}
 
