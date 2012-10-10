@@ -7,7 +7,7 @@ struct mpmc_boundq_1_alt
 private:
 
 	// elements should generally be cache-line-size padded :
-	nonatomic<t_element>  m_array[t_size];
+	t_element               m_array[t_size];
 
 	// rdwr counts the reads & writes that have started
 	atomic<unsigned int>    m_rdwr;
@@ -17,13 +17,16 @@ private:
 
 public:
 
-	mpmc_boundq_1_alt() : m_rdwr(0), m_read(0), m_written(0)
+	mpmc_boundq_1_alt()
 	{
+		m_rdwr = 0;
+		m_read = 0;
+		m_written = 0;
 	}
 
 	//-----------------------------------------------------
 
-	nonatomic<t_element> * read_fetch() {
+	t_element * read_fetch() {
 		unsigned int rdwr = m_rdwr.load(mo_acquire);
 		unsigned int rd,wr;
 		for(;;) {
@@ -33,7 +36,7 @@ public:
 			if ( wr == rd ) // empty
 				return false;
 
-			if ( m_rdwr.compare_exchange_weak(rdwr,rdwr+(1<<16),mo_acq_rel) )
+			if ( m_rdwr.compare_exchange(rdwr,rdwr+(1<<16),mo_acq_rel) )
 				break;
 		}
 
@@ -43,7 +46,7 @@ public:
 			bo.yield();
 		}
 
-		nonatomic<t_element> * p = & ( m_array[ rd % t_size ] );
+		t_element * p = & ( m_array[ rd % t_size ] );
 
 		return p;
 	}
@@ -54,7 +57,7 @@ public:
 
 	//-----------------------------------------------------
 
-	nonatomic<t_element> * write_prepare() {
+	t_element * write_prepare() {
 		unsigned int rdwr = m_rdwr.load(mo_acquire);
 		unsigned int rd,wr;
 		for(;;) {
@@ -64,7 +67,7 @@ public:
 			if ( wr == ((rd + t_size)&0xFFFF) ) // full
 				return NULL;
 
-			if ( m_rdwr.compare_exchange_weak(rdwr,(rd<<16) | ((wr+1)&0xFFFF),mo_acq_rel) )
+			if ( m_rdwr.compare_exchange(rdwr,(rd<<16) | ((wr+1)&0xFFFF),mo_acq_rel) )
 				break;
 		}
 
@@ -74,7 +77,7 @@ public:
 			bo.yield();
 		}
 
-		nonatomic<t_element> * p = & ( m_array[ wr % t_size ] );
+		t_element * p = & ( m_array[ wr % t_size ] );
 
 		return p;
 	}
