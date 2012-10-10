@@ -1,4 +1,4 @@
-DIRS := barrier
+DIRS := barrier mcs-lock
 
 .PHONY: subdirs $(DIRS)
 
