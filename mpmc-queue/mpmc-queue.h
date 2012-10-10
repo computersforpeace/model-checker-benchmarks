@@ -1,3 +1,6 @@
+#include <stdatomic.h>
+#include <unrelacy.h>
+
 template <typename t_element, size_t t_size>
 struct mpmc_boundq_1_alt
 {
@@ -21,7 +24,7 @@ public:
 	//-----------------------------------------------------
 
 	nonatomic<t_element> * read_fetch() {
-		unsigned int rdwr = m_rdwr($).load(mo_acquire);
+		unsigned int rdwr = m_rdwr.load(mo_acquire);
 		unsigned int rd,wr;
 		for(;;) {
 			rd = (rdwr>>16) & 0xFFFF;
@@ -30,14 +33,14 @@ public:
 			if ( wr == rd ) // empty
 				return false;
 
-			if ( m_rdwr($).compare_exchange_weak(rdwr,rdwr+(1<<16),mo_acq_rel) )
+			if ( m_rdwr.compare_exchange_weak(rdwr,rdwr+(1<<16),mo_acq_rel) )
 				break;
 		}
 
 		// (*1)
 		rl::backoff bo;
-		while ( (m_written($).load(mo_acquire) & 0xFFFF) != wr ) {
-			bo.yield($);
+		while ( (m_written.load(mo_acquire) & 0xFFFF) != wr ) {
+			bo.yield();
 		}
 
 		nonatomic<t_element> * p = & ( m_array[ rd % t_size ] );
@@ -46,13 +49,13 @@ public:
 	}
 
 	void read_consume() {
-		m_read($).fetch_add(1,mo_release);
+		m_read.fetch_add(1,mo_release);
 	}
 
 	//-----------------------------------------------------
 
 	nonatomic<t_element> * write_prepare() {
-		unsigned int rdwr = m_rdwr($).load(mo_acquire);
+		unsigned int rdwr = m_rdwr.load(mo_acquire);
 		unsigned int rd,wr;
 		for(;;) {
 			rd = (rdwr>>16) & 0xFFFF;
@@ -61,14 +64,14 @@ public:
 			if ( wr == ((rd + t_size)&0xFFFF) ) // full
 				return NULL;
 
-			if ( m_rdwr($).compare_exchange_weak(rdwr,(rd<<16) | ((wr+1)&0xFFFF),mo_acq_rel) )
+			if ( m_rdwr.compare_exchange_weak(rdwr,(rd<<16) | ((wr+1)&0xFFFF),mo_acq_rel) )
 				break;
 		}
 
 		// (*1)
 		rl::backoff bo;
-		while ( (m_read($).load(mo_acquire) & 0xFFFF) != rd ) {
-			bo.yield($);
+		while ( (m_read.load(mo_acquire) & 0xFFFF) != rd ) {
+			bo.yield();
 		}
 
 		nonatomic<t_element> * p = & ( m_array[ wr % t_size ] );
@@ -78,7 +81,7 @@ public:
 
 	void write_publish()
 	{
-		m_written($).fetch_add(1,mo_release);
+		m_written.fetch_add(1,mo_release);
 	}
 
 	//-----------------------------------------------------
