@@ -1,8 +1,13 @@
 DIRS := barrier mcs-lock
 
-.PHONY: subdirs $(DIRS)
+.PHONY: $(DIRS)
 
 all: $(DIRS)
 
+clean: $(DIRS:%=clean-%)
+
 $(DIRS):
 	$(MAKE) -C $@
+
+clean-%:
+	-$(MAKE) -C $* clean

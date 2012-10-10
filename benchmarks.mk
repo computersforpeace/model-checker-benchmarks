@@ -10,8 +10,9 @@ LIB_SO = lib$(LIB_NAME).so
 
 BASE = ../..
 INCLUDE = -I$(BASE)/include  -I$(BASE) -I../include
-CPPFLAGS += $(INCLUDE)
-CFLAGS += $(INCLUDE)
+FLAGS := -g -rdynamic
+CPPFLAGS += $(INCLUDE) $(FLAGS)
+CFLAGS += $(INCLUDE) $(FLAGS)
 LDFLAGS += -L$(BASE) -l$(LIB_NAME)
 
 # Mac OSX options

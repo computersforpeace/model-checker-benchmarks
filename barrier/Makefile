@@ -1,11 +1,11 @@
 include ../benchmarks.mk
 
-BIN = barrier
+TESTNAME = barrier
 
-all: barrier
+all: $(TESTNAME)
 
-barrier: barrier.cc barrier.h
+$(TESTNAME): $(TESTNAME).cc $(TESTNAME).h
 	$(CXX) -o $@ $< $(CPPFLAGS) $(LDFLAGS)
 
 clean:
-	rm -f $(BIN) *.o
+	rm -f $(TESTNAME) *.o
