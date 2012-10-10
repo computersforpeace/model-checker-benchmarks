@@ -1,4 +1,4 @@
-DIRS := barrier mcs-lock
+DIRS := barrier mcs-lock mpmc-queue
 
 .PHONY: $(DIRS)
 
