@@ -9,7 +9,7 @@ LIB_NAME = model
 LIB_SO = lib$(LIB_NAME).so
 
 BASE = ../..
-INCLUDE = -I$(BASE)/include  -I$(BASE)
+INCLUDE = -I$(BASE)/include  -I$(BASE) -I../include
 CPPFLAGS += $(INCLUDE)
 CFLAGS += $(INCLUDE)
 LDFLAGS += -L$(BASE) -l$(LIB_NAME)
