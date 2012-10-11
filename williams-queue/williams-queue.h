@@ -7,8 +7,6 @@
  *  http://www.manning.com/williams/
  */
 
-// ./listing_7.13.cpp
-
 #include <memory>
 #include <atomic>
 
@@ -16,16 +14,8 @@ template<typename T>
 class lock_free_queue
 {
 private:
-    struct node
-    {
-        std::shared_ptr<T> data;
-        node* next;
-        node():
-            next(nullptr)
-        {}
-    };
-    std::atomic<node*> head;
-    std::atomic<node*> tail;
+    struct node;
+    struct node_counter;
     node* pop_head()
     {
         node* const old_head=head.load();
@@ -40,8 +30,8 @@ public:
     lock_free_queue():
         head(new node),tail(head.load())
     {}
-    lock_free_queue(const lock_free_queue& other)=delete;
-    lock_free_queue& operator=(const lock_free_queue& other)=delete;
+    // lock_free_queue(const lock_free_queue& other)=delete;
+    // lock_free_queue& operator=(const lock_free_queue& other)=delete;
     ~lock_free_queue()
     {
         while(node* const old_head=head.load())
@@ -50,38 +40,8 @@ public:
             delete old_head;
         }
     }
-    std::shared_ptr<T> pop()
-    {
-        node* old_head=pop_head();
-        if(!old_head)
-        {
-            return std::shared_ptr<T>();
-        }
-        std::shared_ptr<T> const res(old_head->data);
-        delete old_head;
-        return res;
-    }
-    void push(T new_value)
-    {
-        std::shared_ptr<T> new_data(std::make_shared<T>(new_value));
-        node* p=new node;
-        node* const old_tail=tail.load();
-        old_tail->data.swap(new_data);
-        old_tail->next=p;
-        tail.store(p);
-    }
-};
 
-
-// ./listing_7.15.cpp
-
-#include <atomic>
-
-template<typename T>
-class lock_free_queue
-{
 private:
-    struct node;
     struct counted_node_ptr
     {
         int external_count;
@@ -94,11 +54,12 @@ private:
         unsigned internal_count:30;
         unsigned external_counters:2;
     };
+
     struct node
     {
         std::atomic<T*> data;
         std::atomic<node_counter> count;
-        counted_node_ptr next;
+        std::atomic<counted_node_ptr> next;
         node()
         {
             node_counter new_count;
@@ -108,77 +69,6 @@ private:
             next.ptr=nullptr;
             next.external_count=0;
         }
-    };
-public:
-    void push(T new_value)
-    {
-        std::unique_ptr<T> new_data(new T(new_value));
-        counted_node_ptr new_next;
-        new_next.ptr=new node;
-        new_next.external_count=1;
-        counted_node_ptr old_tail=tail.load();
-        for(;;)
-        {
-            increase_external_count(tail,old_tail);
-            T* old_data=nullptr;
-            if(old_tail.ptr->data.compare_exchange_strong(
-                   old_data,new_data.get()))
-            {
-                old_tail.ptr->next=new_next;
-                old_tail=tail.exchange(new_next);
-                free_external_counter(old_tail);
-                new_data.release();
-                break;
-            }
-            old_tail.ptr->release_ref();
-        }
-    }
-};
-
-
-// ./listing_7.16.cpp
-
-template<typename T>
-class lock_free_queue
-{
-private:
-    struct node
-    {
-        void release_ref();
-    };
-public:
-    std::unique_ptr<T> pop()
-    {
-        counted_node_ptr old_head=head.load(std::memory_order_relaxed);
-        for(;;)
-        {
-            increase_external_count(head,old_head);
-            node* const ptr=old_head.ptr;
-            if(ptr==tail.load().ptr)
-            {
-                ptr->release_ref();
-                return std::unique_ptr<T>();
-            }
-            if(head.compare_exchange_strong(old_head,ptr->next))
-            {
-                T* const res=ptr->data.exchange(nullptr);
-                free_external_counter(old_head);
-                return std::unique_ptr<T>(res);
-            }
-            ptr->release_ref();
-        }
-    }
-};
-
-
-// ./listing_7.17.cpp
-
-template<typename T>
-class lock_free_queue
-{
-private:
-    struct node
-    {
         void release_ref()
         {
             node_counter old_counter=
@@ -199,15 +89,7 @@ private:
             }
         }
     };
-};
 
-
-// ./listing_7.18.cpp
-
-template<typename T>
-class lock_free_queue
-{
-private:
     static void increase_external_count(
         std::atomic<counted_node_ptr>& counter,
         counted_node_ptr& old_counter)
@@ -223,15 +105,7 @@ private:
                   std::memory_order_acquire,std::memory_order_relaxed));
         old_counter.external_count=new_counter.external_count;
     }
-};
 
-
-// ./listing_7.19.cpp
-
-template<typename T>
-class lock_free_queue
-{
-private:
     static void free_external_counter(counted_node_ptr &old_node_ptr)
     {
         node* const ptr=old_node_ptr.ptr;
@@ -254,21 +128,6 @@ private:
             delete ptr;
         }
     }
-};
-
-
-// ./listing_7.20.cpp
-
-template<typename T>
-class lock_free_queue
-{
-private:
-    struct node
-    {
-        std::atomic<T*> data;
-        std::atomic<node_counter> count;
-        std::atomic<counted_node_ptr> next;
-    };
 public:
     std::unique_ptr<T> pop()
     {
@@ -291,14 +150,7 @@ public:
             ptr->release_ref();
         }
     }
-};
 
-
-// ./listing_7.21.cpp
-
-template<typename T>
-class lock_free_queue
-{
 private:
     void set_new_tail(counted_node_ptr &old_tail,
                       counted_node_ptr const &new_tail)
