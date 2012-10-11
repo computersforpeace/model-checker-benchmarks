@@ -12,18 +12,14 @@ static uint32_t shared;
 void threadA(void *arg)
 {
 	mcs_mutex::guard g(mutex);
-	mutex->lock(&g);
 	printf("store: %d\n", 17);
 	store_32(&shared, 17);
-	mutex->unlock(&g);
 }
 
 void threadB(void *arg)
 {
 	mcs_mutex::guard g(mutex);
-	mutex->lock(&g);
 	printf("load: %u\n", load_32(&shared));
-	mutex->unlock(&g);
 }
 
 int user_main(int argc, char **argv)
