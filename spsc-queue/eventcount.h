@@ -1,12 +1,14 @@
 #include <unrelacy.h>
+#include <atomic>
+#include <mutex>
 
 class eventcount
 {
 public:
-	eventcount()
-		: count(0)
-		, waiters(0)
-	{}
+	eventcount() : waiters(0)
+	{
+		count = 0;
+	}
 
 	void signal_relaxed()
 	{
@@ -46,7 +48,7 @@ std::memory_order_seq_cst);
 private:
 	std::atomic<unsigned> count;
 	rl::var<unsigned> waiters;
-	mutex guard;
+	std::mutex guard;
 	condition_variable_any cv;
 
 	void signal_impl(unsigned cmp)
@@ -54,7 +56,7 @@ private:
 		if (cmp & 0x80000000)
 		{
 			guard.lock($);
-			while (false == count.compare_swap(cmp,
+			while (false == count.compare_exchange_weak(cmp,
 				(cmp + 1) & 0x7FFFFFFF, std::memory_order_relaxed));
 			unsigned w = waiters($);
 			waiters = 0;

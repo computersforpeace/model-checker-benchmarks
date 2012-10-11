@@ -1,4 +1,5 @@
 #include <unrelacy.h>
+#include <atomic>
 
 #include "eventcount.h"
 
@@ -51,9 +52,10 @@ private:
 		rl::var<T> data;
 
 		node(T data = T())
-			: next(0)
-			, data(data)
-		{}
+			: data(data)
+		{
+			next = 0;
+		}
 	};
 
 	rl::var<node*> head;

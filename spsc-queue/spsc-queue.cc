@@ -1,8 +1,8 @@
+#include <threads.h>
+
 #include "queue.h"
 
-struct spsc_queue_test : rl::test_suite<spsc_queue_test, 2>
-{
-	spsc_queue<int> q;
+spsc_queue<int> q;
 
 	void thread(unsigned thread_index)
 	{
@@ -16,9 +16,13 @@ struct spsc_queue_test : rl::test_suite<spsc_queue_test, 2>
 			RL_ASSERT(11 == d);
 		}
 	}
-};
 
 int main()
 {
-	rl::simulate<spsc_queue_test>();
+	thrd_t A, B;
+	thrd_create(&A, (thrd_start_t)&thread, (void *)0);
+	thrd_create(&B, (thrd_start_t)&thread, (void *)1);
+	thrd_join(A);
+	thrd_join(B);
+	return 0;
 }
