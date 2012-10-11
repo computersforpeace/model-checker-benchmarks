@@ -26,22 +26,7 @@ private:
         head.store(old_head->next);
         return old_head;
     }
-public:
-    lock_free_queue():
-        head(new node),tail(head.load())
-    {}
-    // lock_free_queue(const lock_free_queue& other)=delete;
-    // lock_free_queue& operator=(const lock_free_queue& other)=delete;
-    ~lock_free_queue()
-    {
-        while(node* const old_head=head.load())
-        {
-            head.store(old_head->next);
-            delete old_head;
-        }
-    }
 
-private:
     struct counted_node_ptr
     {
         int external_count;
@@ -66,8 +51,9 @@ private:
             new_count.internal_count=0;
             new_count.external_counters=2;
             count.store(new_count);
-            next.ptr=nullptr;
-            next.external_count=0;
+
+	    counted_node_ptr emptynode = {0, nullptr};
+	    next = emptynode;
         }
         void release_ref()
         {
@@ -164,6 +150,23 @@ private:
             current_tail_ptr->release_ref();
     }
 public:
+    lock_free_queue()
+    {
+        counted_node_ptr newnode = {0, new node};
+        head = newnode;
+	tail = head.load();
+    }
+    // lock_free_queue(const lock_free_queue& other)=delete;
+    // lock_free_queue& operator=(const lock_free_queue& other)=delete;
+    ~lock_free_queue()
+    {
+        while(node* const old_head=head.load())
+        {
+            head.store(old_head->next);
+            delete old_head;
+        }
+    }
+
     void push(T new_value)
     {
         std::unique_ptr<T> new_data(new T(new_value));
