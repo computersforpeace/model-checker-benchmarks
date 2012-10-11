@@ -1,3 +1,5 @@
+#include <unrelacy.h>
+
 #include "eventcount.h"
 
 template<typename T>
@@ -7,21 +9,21 @@ public:
 	spsc_queue()
 	{
 		node* n = RL_NEW node ();
-		head($) = n;
-		tail($) = n;
+		head = n;
+		tail = n;
 	}
 
 	~spsc_queue()
 	{
-		RL_ASSERT(head($) == tail($));
+		RL_ASSERT(head == tail);
 		RL_DELETE((node*)head($));
 	}
 
 	void enqueue(T data)
 	{
 		node* n = RL_NEW node (data);
-		head($)->next($).store(n, std::memory_order_release);
-		head($) = n;
+		head($)->next.store(n, std::memory_order_release);
+		head = n;
 		ec.signal_relaxed();
 	}
 
@@ -62,12 +64,12 @@ private:
 	T try_dequeue()
 	{
 		node* t = tail($);
-		node* n = t->next($).load(std::memory_order_acquire);
+		node* n = t->next.load(std::memory_order_acquire);
 		if (0 == n)
 			return 0;
 		T data = n->data($);
 		RL_DELETE(t);
-		tail($) = n;
+		tail = n;
 		return data;
 	}
 };
