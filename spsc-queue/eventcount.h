@@ -1,6 +1,7 @@
 #include <unrelacy.h>
 #include <atomic>
 #include <mutex>
+#include <condition_variable>
 
 class eventcount
 {
@@ -49,7 +50,7 @@ private:
 	std::atomic<unsigned> count;
 	rl::var<unsigned> waiters;
 	std::mutex guard;
-	condition_variable_any cv;
+	std::condition_variable_any cv;
 
 	void signal_impl(unsigned cmp)
 	{
