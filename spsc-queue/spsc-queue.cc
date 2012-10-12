@@ -17,7 +17,7 @@ spsc_queue<int> q;
 		}
 	}
 
-int main()
+int user_main(int argc, char **argv)
 {
 	thrd_t A, B;
 	thrd_create(&A, (thrd_start_t)&thread, (void *)0);

@@ -40,7 +40,7 @@ std::memory_order_seq_cst);
 			if (cmp == (ec & 0x7FFFFFFF))
 			{
 				waiters += 1;
-				cv.wait(guard, $);
+				cv.wait(guard);
 			}
 			guard.unlock($);
 		}
@@ -50,7 +50,7 @@ private:
 	std::atomic<unsigned> count;
 	rl::var<unsigned> waiters;
 	std::mutex guard;
-	std::condition_variable_any cv;
+	std::condition_variable cv;
 
 	void signal_impl(unsigned cmp)
 	{
