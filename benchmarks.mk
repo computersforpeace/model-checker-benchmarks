@@ -9,7 +9,7 @@ LIB_NAME = model
 LIB_SO = lib$(LIB_NAME).so
 
 BASE = ../..
-INCLUDE = -I$(BASE)/include  -I$(BASE) -I../include
+INCLUDE = -I$(BASE)/include -I../include
 FLAGS := -g -rdynamic
 CPPFLAGS += $(INCLUDE) $(FLAGS)
 CFLAGS += $(INCLUDE) $(FLAGS)
