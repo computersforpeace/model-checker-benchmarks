@@ -25,7 +25,7 @@ void threadB(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
 int user_main(int argc, char **argv)
 {
 	struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> queue;
-	thrd_t A, B;
+	thrd_t A1, A2, B1, B2;
 
 	int32_t *bin = queue.write_prepare();
 	store_32(bin, 17);
@@ -33,10 +33,14 @@ int user_main(int argc, char **argv)
 
 	printf("Start threads\n");
 
-	thrd_create(&A, (thrd_start_t)&threadA, &queue);
-	thrd_create(&B, (thrd_start_t)&threadB, &queue);
-	thrd_join(A);
-	thrd_join(B);
+	thrd_create(&A1, (thrd_start_t)&threadA, &queue);
+	thrd_create(&A2, (thrd_start_t)&threadA, &queue);
+	thrd_create(&B1, (thrd_start_t)&threadB, &queue);
+	thrd_create(&B2, (thrd_start_t)&threadB, &queue);
+	thrd_join(A1);
+	thrd_join(A2);
+	thrd_join(B1);
+	thrd_join(B2);
 
 	printf("Threads complete\n");
 
