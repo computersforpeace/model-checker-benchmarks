@@ -15,9 +15,11 @@ void threadA(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
 
 void threadB(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
 {
-	int32_t *bin = queue->read_fetch();
-	printf("Read: %d\n", load_32(bin));
-	queue->read_consume();
+	int32_t *bin;
+	while (bin = queue->read_fetch()) {
+		printf("Read: %d\n", load_32(bin));
+		queue->read_consume();
+	}
 }
 
 int user_main(int argc, char **argv)
