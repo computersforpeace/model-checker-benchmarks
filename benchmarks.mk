@@ -10,10 +10,10 @@ LIB_SO = lib$(LIB_NAME).so
 
 BASE = ../..
 INCLUDE = -I$(BASE)/include -I../include
-FLAGS := -g -rdynamic
+FLAGS := -g
 CPPFLAGS += $(INCLUDE) $(FLAGS)
 CFLAGS += $(INCLUDE) $(FLAGS)
-LDFLAGS += -L$(BASE) -l$(LIB_NAME)
+LDFLAGS += -L$(BASE) -l$(LIB_NAME) -rdynamic
 
 # Mac OSX options
 ifeq ($(UNAME), Darwin)
