@@ -20,16 +20,21 @@ void threadB(void *arg)
 	printf("var = %d\n", load_32(&var));
 }
 
+#define NUMREADERS 1
 int user_main(int argc, char **argv)
 {
-	thrd_t t2, t3;
+	thrd_t A, B[NUMREADERS];
+	int i;
 
-	barr = new spinning_barrier(2);
+	barr = new spinning_barrier(NUMREADERS + 1);
 
-	thrd_create(&t2, &threadA, NULL);
-	thrd_create(&t3, &threadB, NULL);
-	thrd_join(t2);
-	thrd_join(t3);
+	thrd_create(&A, &threadA, NULL);
+	for (i = 0; i < NUMREADERS; i++)
+		thrd_create(&B[i], &threadB, NULL);
+
+	for (i = 0; i < NUMREADERS; i++)
+		thrd_join(B[i]);
+	thrd_join(A);
 
 	return 0;
 }
