@@ -27,7 +27,7 @@ void threadB(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
 #define MAXREADERS 3
 #define MAXWRITERS 3
 
-int readers = 2, writers = 2;
+int readers = 1, writers = 2;
 
 void print_usage()
 {

@@ -1,10 +1,11 @@
 include ../benchmarks.mk
 
 TESTNAME = mpmc-queue
+TESTS = mpmc-queue mpmc-1r2w mpmc-2r1w
 
-all: $(TESTNAME)
+all: $(TESTS)
 
-$(TESTNAME): $(TESTNAME).cc $(TESTNAME).h
+%: %.cc $(TESTNAME).h
 	$(CXX) -o $@ $< $(CPPFLAGS) $(LDFLAGS)
 
 clean:
