@@ -37,7 +37,7 @@ function run_test {
 	echo "*******************************"
 	echo "Re-running test for timing data"
 	echo "*******************************"
-	time ${RUN} ${t} ${ARGS} > /dev/null 2>&1
+	(time ${RUN} ${t} ${ARGS} > /dev/null 2>&1) 2>&1
 	echo
 	echo "Test done; sleeping for a few seconds"
 	echo
