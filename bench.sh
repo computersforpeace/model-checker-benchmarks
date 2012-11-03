@@ -1,14 +1,20 @@
 #!/bin/bash
 
 # A (work-in-progress) test script for running our benchmarks
-# Runs all tests, logging output to a directory named 'run-<date-time>'
+# Runs all tests, logging output to a directory named
+# '${BASEDIR}/run-<date-time>', where ${BASEDIR} is either the current
+# directory or the first parameter to this script
 
 ## Unfinished benchmarks - do not use
 # queue williams-queue
 
 DATECMD="date +%Y-%m-%d-%R"
 DATE="`${DATECMD}`"
-DIR="run-${DATE}"
+BASEDIR=.
+
+[ $# -gt 0 ] && [ -d "$1" ] && BASEDIR="$1" && shift
+
+DIR="${BASEDIR}/run-${DATE}"
 
 TESTS="barrier/barrier mcs-lock/mcs-lock spsc-queue/spsc-queue mpmc-queue/mpmc-1r2w mpmc-queue/mpmc-2r1w mpmc-queue/mpmc-queue linuxrwlocks/linuxrwlocks"
 MODEL_ARGS="-f 4 -m 2"
