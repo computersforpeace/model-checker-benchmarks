@@ -5,15 +5,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <model-assert.h>
+
 #define $
 
-#define _TEST_ASSERT(expr) \
-	if (!(expr)) { \
-		printf("Error: assertion failed at %s:%d\n", __FILE__, __LINE__); \
-		exit(EXIT_FAILURE); \
-	}
-#define ASSERT(expr) _TEST_ASSERT(expr)
-#define RL_ASSERT(expr) _TEST_ASSERT(expr)
+#define ASSERT(expr) MODEL_ASSERT(expr)
+#define RL_ASSERT(expr) MODEL_ASSERT(expr)
 
 #define RL_NEW new
 #define RL_DELETE(expr) delete expr
