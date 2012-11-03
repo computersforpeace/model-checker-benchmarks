@@ -2,12 +2,18 @@
 #define __UNRELACY_H__
 
 #include <stdatomic.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define $
 
-/* Should re-define to something meaningful */
-#define ASSERT(expr)
-#define RL_ASSERT(expr)
+#define _TEST_ASSERT(expr) \
+	if (!(expr)) { \
+		printf("Error: assertion failed at %s:%d\n", __FILE__, __LINE__); \
+		exit(EXIT_FAILURE); \
+	}
+#define ASSERT(expr) _TEST_ASSERT(expr)
+#define RL_ASSERT(expr) _TEST_ASSERT(expr)
 
 #define RL_NEW new
 #define RL_DELETE(expr) delete expr
@@ -24,12 +30,13 @@ namespace rl {
 	struct var {
 		var() { value = 0; }
 		var(T v) { value = v; }
-		var(var const& r) { value = r; }
+		var(var const& r) { value = r.value; }
 		~var() { }
 
 		void operator = (T v) { value = v; }
 		T operator () () { return value; }
 		void operator += (T v) { value += v; }
+		bool operator == (const struct var<T> v) const { return value == v.value; }
 
 		T value;
 	};
