@@ -1,23 +1,27 @@
 #!/bin/bash
 
 # A (work-in-progress) test script for running our benchmarks
+# Runs all tests, logging output to a directory named 'run-<date-time>'
 
 ## Unfinished benchmarks - do not use
 # queue williams-queue
 
-RUN="./run.sh"
-DATE="date +%Y-%m-%d-%R"
+DATECMD="date +%Y-%m-%d-%R"
+DATE="`${DATECMD}`"
+DIR="run-${DATE}"
 
-${DATE}
-
+TESTS="barrier/barrier mcs-lock/mcs-lock spsc-queue/spsc-queue mpmc-queue/mpmc-1r2w mpmc-queue/mpmc-2r1w mpmc-queue/mpmc-queue"
+MODEL_ARGS="-f 4 -m 2"
 COUNT=0
 
 function run_test {
 	t=$1
 	shift
 	ARGS="$@"
+	RUN="./run.sh"
+	LOG=${DIR}/log-${COUNT}
+
 	echo "-----------------------------------------------"
-	LOG=log-${COUNT}
 	echo "*******************************"
 	echo "Running test ${COUNT} (${t}): logging to ${LOG}"
 	echo "ARGS=${ARGS}"
@@ -41,12 +45,17 @@ function run_test {
 	let COUNT++
 }
 
-TESTS="barrier/barrier mcs-lock/mcs-lock spsc-queue/spsc-queue mpmc-queue/mpmc-1r2w mpmc-queue/mpmc-2r1w mpmc-queue/mpmc-queue"
-MODEL_ARGS="-f 4 -m 1"
-for t in ${TESTS}
-do
-	run_test ${t} ${MODEL_ARGS}
-done
-#run_test mpmc-queue/mpmc-queue ${MODEL_ARGS} -- -r 2 -w 1
-#run_test mpmc-queue/mpmc-queue ${MODEL_ARGS} -- -r 1 -w 2
-#run_test mpmc-queue/mpmc-queue ${MODEL_ARGS} -- -r 2 -w 2
+function run_all_tests {
+	echo ${DATE}
+
+	for t in ${TESTS}
+	do
+		run_test ${t} ${MODEL_ARGS}
+	done
+	#run_test mpmc-queue/mpmc-queue ${MODEL_ARGS} -- -r 2 -w 1
+	#run_test mpmc-queue/mpmc-queue ${MODEL_ARGS} -- -r 1 -w 2
+	#run_test mpmc-queue/mpmc-queue ${MODEL_ARGS} -- -r 2 -w 2
+}
+
+mkdir ${DIR}
+(git log --oneline -1; echo; run_all_tests) | tee ${DIR}/timing.log
