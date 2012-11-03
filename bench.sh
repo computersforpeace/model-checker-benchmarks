@@ -10,7 +10,7 @@ DATECMD="date +%Y-%m-%d-%R"
 DATE="`${DATECMD}`"
 DIR="run-${DATE}"
 
-TESTS="barrier/barrier mcs-lock/mcs-lock spsc-queue/spsc-queue mpmc-queue/mpmc-1r2w mpmc-queue/mpmc-2r1w mpmc-queue/mpmc-queue"
+TESTS="barrier/barrier mcs-lock/mcs-lock spsc-queue/spsc-queue mpmc-queue/mpmc-1r2w mpmc-queue/mpmc-2r1w mpmc-queue/mpmc-queue linuxrwlocks/linuxrwlocks"
 MODEL_ARGS="-f 4 -m 2"
 COUNT=0
 
