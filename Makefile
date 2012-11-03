@@ -1,4 +1,4 @@
-DIRS := barrier mcs-lock mpmc-queue spsc-queue
+DIRS := barrier mcs-lock mpmc-queue spsc-queue linuxrwlocks
 
 .PHONY: $(DIRS)
 
