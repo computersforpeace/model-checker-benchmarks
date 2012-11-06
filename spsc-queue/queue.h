@@ -9,7 +9,7 @@ class spsc_queue
 public:
 	spsc_queue()
 	{
-		node* n = RL_NEW node ();
+		node* n = new node ();
 		head = n;
 		tail = n;
 	}
@@ -17,12 +17,12 @@ public:
 	~spsc_queue()
 	{
 		RL_ASSERT(head == tail);
-		RL_DELETE((node*)head($));
+		delete ((node*)head($));
 	}
 
 	void enqueue(T data)
 	{
-		node* n = RL_NEW node (data);
+		node* n = new node (data);
 		head($)->next.store(n, std::memory_order_release);
 		head = n;
 		ec.signal_relaxed();
@@ -70,7 +70,7 @@ private:
 		if (0 == n)
 			return 0;
 		T data = n->data($);
-		RL_DELETE(t);
+		delete (t);
 		tail = n;
 		return data;
 	}
