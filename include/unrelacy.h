@@ -4,6 +4,8 @@
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <mutex>
+#include <condition_variable>
 
 #include <model-assert.h>
 
