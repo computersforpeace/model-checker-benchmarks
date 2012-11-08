@@ -1,3 +1,6 @@
 /mpmc-queue
 /mpmc-1r2w
 /mpmc-2r1w
+/mpmc-queue-noinit
+/mpmc-1r2w-noinit
+/mpmc-2r1w-noinit
