@@ -16,8 +16,15 @@ BASEDIR=.
 
 DIR="${BASEDIR}/run-${DATE}"
 
-TESTS="barrier/barrier mcs-lock/mcs-lock spsc-queue/spsc-queue mpmc-queue/mpmc-1r2w mpmc-queue/mpmc-2r1w mpmc-queue/mpmc-queue linuxrwlocks/linuxrwlocks"
-MODEL_ARGS="-f 4 -m 2"
+TESTS="barrier/barrier"
+TESTS+=" mcs-lock/mcs-lock"
+TESTS+=" spsc-queue/spsc-queue"
+TESTS+=" mpmc-queue/mpmc-2r1w"
+TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
+TESTS+=" mpmc-queue/mpmc-queue-noinit"
+TESTS+=" linuxrwlocks/linuxrwlocks"
+
+MODEL_ARGS="-f 10 -m 2 -e 1"
 COUNT=0
 
 function run_test {
