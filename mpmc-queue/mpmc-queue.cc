@@ -91,9 +91,12 @@ int user_main(int argc, char **argv)
 	//process_params(argc, argv);
 	printf("%d reader(s), %d writer(s)\n", readers, writers);
 
+#ifndef CONFIG_MPMC_NO_INITIAL_ELEMENT
+	printf("Adding initial element\n");
 	int32_t *bin = queue.write_prepare();
 	store_32(bin, 17);
 	queue.write_publish();
+#endif
 
 	printf("Start threads\n");
 
