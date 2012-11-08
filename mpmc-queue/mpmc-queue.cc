@@ -27,7 +27,19 @@ void threadB(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
 #define MAXREADERS 3
 #define MAXWRITERS 3
 
-int readers = 2, writers = 2;
+#ifdef CONFIG_MPMC_READERS
+#define DEFAULT_READERS (CONFIG_MPMC_READERS)
+#else
+#define DEFAULT_READERS 2
+#endif
+
+#ifdef CONFIG_MPMC_WRITERS
+#define DEFAULT_WRITERS (CONFIG_MPMC_WRITERS)
+#else
+#define DEFAULT_WRITERS 2
+#endif
+
+int readers = DEFAULT_READERS, writers = DEFAULT_WRITERS;
 
 void print_usage()
 {
