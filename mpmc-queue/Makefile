@@ -9,4 +9,4 @@ all: $(TESTS)
 	$(CXX) -o $@ $< $(CPPFLAGS) $(LDFLAGS)
 
 clean:
-	rm -f $(TESTNAME) *.o
+	rm -f $(TESTS) *.o
