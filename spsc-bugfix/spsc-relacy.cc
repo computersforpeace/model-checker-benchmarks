@@ -23,5 +23,7 @@ struct spsc_queue_test : rl::test_suite<spsc_queue_test, 2>
 
 int main()
 {
-	rl::simulate<spsc_queue_test>();
+	rl::test_params params;
+	params.search_type = rl::fair_full_search_scheduler_type;
+	rl::simulate<spsc_queue_test>(params);
 }
