@@ -22,7 +22,7 @@ public:
 		node* n = new node (data);
 		head($)->next.store(n, std::memory_order_release);
 		head($) = n;
-		ec.signal_relaxed();
+		ec.signal();
 	}
 
 	T dequeue()
