@@ -2,8 +2,9 @@
 #
 # Runs a simple test (default: ./barrier/barrier)
 # Syntax:
-#  ./run.sh [gdb]
-#  ./run.sh [test program] [gdb]
+#  ./run.sh [test program] [OPTIONS]
+#  ./run.sh [OPTIONS]
+#  ./run.sh [gdb [test program]]
 #
 # If you include a 'gdb' argument, the your program will be launched with gdb.
 # You can also supply a test program argument to run something besides the
@@ -11,14 +12,12 @@
 #
 
 BIN=./barrier/barrier
+PREFIX=
 
 export LD_LIBRARY_PATH=..
 
-[ $# -gt 0 ] && [ "$1" != "gdb" ] && BIN=$1 && shift
+[ $# -gt 0 ] && [ "$1" = "gdb" ] && PREFIX=gdb && shift
+[ $# -gt 0 ] && [ -x "$1" ] && [ -f "$1" ] && BIN="$1" && shift
 
-if [ $# -gt 0 ] && [ "$1" = "gdb" ]; then
-	shift
-	gdb $BIN $@
-fi
-
-$BIN $@
+set -x
+$PREFIX $BIN $@
