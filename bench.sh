@@ -40,9 +40,7 @@ function run_test {
 	echo "Running test ${COUNT} (${t}): logging to ${LOG}"
 	echo "ARGS=${ARGS}"
 	echo "*******************************"
-	time ${RUN} ${t} ${ARGS} > ${LOG} 2>&1
-	echo
-	grep -A 2 "Number of executions" ${LOG} | tail -3
+	time ${RUN} ${t} ${ARGS} 2>&1 | tee ${LOG}
 	echo
 	echo "Test done; sleeping for a few seconds"
 	echo
