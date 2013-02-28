@@ -40,7 +40,7 @@ function run_test {
 	echo "Running test ${COUNT} (${t}): logging to ${LOG}"
 	echo "ARGS=${ARGS}"
 	echo "*******************************"
-	time ${RUN} ${t} ${ARGS} 2>&1 | tee ${LOG}
+	(time ${RUN} ${t} ${ARGS} 2>&1) 2>&1 | tee ${LOG}
 	echo
 	echo "Test done; sleeping for a few seconds"
 	echo
@@ -61,4 +61,4 @@ function run_all_tests {
 }
 
 mkdir ${DIR}
-(git log --oneline -1; echo; run_all_tests) | tee ${DIR}/timing.log
+(cd ..; git log --oneline -1; cd - > /dev/null; git log --oneline -1; echo; run_all_tests) | tee ${DIR}/timing.log
