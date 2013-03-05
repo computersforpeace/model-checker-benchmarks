@@ -1,3 +1,5 @@
+#include <stdatomic.h>
+
 #define TRUE				1
 #define FALSE				0
 
@@ -11,8 +13,8 @@ typedef union pointer {
 		volatile unsigned short count;
 		volatile unsigned short ptr;
 	} sep;
-	volatile unsigned long con;
-}pointer_t;
+	atomic_ulong con;
+} pointer_t;
 
 typedef struct node {
 	unsigned value;
