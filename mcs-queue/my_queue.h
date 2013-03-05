@@ -1,6 +1,5 @@
 #define TRUE				1
 #define FALSE				0
-#define NULL				0
 
 #define MAX_NODES			0xff
 #define MAX_SERIAL			10000
@@ -35,3 +34,8 @@ typedef struct shared_mem {
 	node_t nodes[MAX_NODES+1];
 	unsigned serial;
 } shared_mem_t;
+
+void init_private();
+void init_memory();
+void init_queue();
+unsigned dequeue();

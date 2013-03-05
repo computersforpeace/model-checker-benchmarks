@@ -3,8 +3,6 @@
 extern unsigned pid;
 extern unsigned iterations;
 extern unsigned initial_nodes;
-extern unsigned backoff;
-extern unsigned backoff_base;
 extern private_t private;
 extern shared_mem_t* smp;
 
@@ -19,12 +17,12 @@ void init_memory()
 {
 }
 
-unsigned new_node()
+static unsigned new_node()
 {
 	return private.node;
 }
 
-void reclaim(unsigned node)
+static void reclaim(unsigned node)
 {
 	private.node = node;
 }
@@ -72,13 +70,11 @@ void enqueue(unsigned val)
 	smp->nodes[node].value = val;
 	smp->nodes[node].next.sep.ptr = NULL;
 
-	backoff = backoff_base;
 	for (success = FALSE; success == FALSE; ) {
 		tail.con = smp->tail.con;
 		next.con = smp->nodes[tail.sep.ptr].next.con;
 		if (tail.con == smp->tail.con) {
 			if (next.sep.ptr == NULL) {
-				backoff = backoff_base;
 				success = cas(&smp->nodes[tail.sep.ptr].next, 
 						next.con,
 						MAKE_LONG(node, next.sep.count+1));
@@ -88,7 +84,7 @@ void enqueue(unsigned val)
 						tail.con,
 						MAKE_LONG(smp->nodes[tail.sep.ptr].next.sep.ptr,
 							tail.sep.count+1));
-				backoff_delay();
+				thrd_yield();
 			}
 		}
 	}
@@ -105,7 +101,6 @@ unsigned dequeue()
 	pointer_t tail;
 	pointer_t next;
 
-	backoff = backoff_base;
 	for (success = FALSE; success == FALSE; ) {
 		head.con = smp->head.con;
 		tail.con = smp->tail.con;
@@ -118,14 +113,14 @@ unsigned dequeue()
 				cas(&smp->tail,
 						tail.con,
 						MAKE_LONG(next.sep.ptr, tail.sep.count+1));
-				backoff_delay();
+				thrd_yield();
 			} else {
 				value = smp->nodes[next.sep.ptr].value;
 				success = cas(&smp->head,
 						head.con,
 						MAKE_LONG(next.sep.ptr, head.sep.count+1));
 				if (success == FALSE) {
-					backoff_delay();
+					thrd_yield();
 				}
 			}
 		}

@@ -6,8 +6,6 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <signal.h>
-#include <sys/cachectl.h>
-#include <sys/sysmp.h>
-#include <ulocks.h>
 #include <assert.h>
+#include <threads.h>
 #include "my_queue.h"
