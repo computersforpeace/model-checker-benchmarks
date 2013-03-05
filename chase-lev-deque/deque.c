@@ -8,7 +8,7 @@ typedef struct {
 
 typedef struct {
 	atomic_size_t top, bottom;
-	Atomic(Array *) array;
+	atomic_uintptr_t array; /* Atomic(Array *) */
 } Deque;
 
 int take(Deque *q) {
