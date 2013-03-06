@@ -32,18 +32,18 @@ void init_queue(queue_t *q, int num_threads)
 	tail = MAKE_POINTER(1, 0);
 	next = MAKE_POINTER(0, 0); // (NULL, 0)
 
-	atomic_store(&q->head, head);
-	atomic_store(&q->tail, tail);
-	atomic_store(&q->nodes[1].next, next);
+	atomic_init(&q->head, head);
+	atomic_init(&q->tail, tail);
+	atomic_init(&q->nodes[1].next, next);
 
 	/* initialize avail list */
 	for (i = 2; i < MAX_NODES; i++) {
 		next = MAKE_POINTER(i + 1, 0);
-		atomic_store(&q->nodes[i].next, next);
+		atomic_init(&q->nodes[i].next, next);
 	}
 
 	next = MAKE_POINTER(0, 0); // (NULL, 0)
-	atomic_store(&q->nodes[MAX_NODES].next, next);
+	atomic_init(&q->nodes[MAX_NODES].next, next);
 }
 
 void enqueue(queue_t *q, unsigned int val)
