@@ -1,30 +1,30 @@
 #include <threads.h>
+#include <stdlib.h>
 
 #include "my_queue.h"
 
-extern private_t private;
-
-void init_private(int pid)
-{
-	private.node = 2 + pid;
-}
+static unsigned int *node_nums;
 
 static unsigned int new_node()
 {
-	return private.node;
+	return node_nums[get_thread_num()];
 }
 
 static void reclaim(unsigned int node)
 {
-	private.node = node;
+	node_nums[get_thread_num()] = node;
 }
 
-void init_queue(queue_t *q)
+void init_queue(queue_t *q, int num_threads)
 {
 	unsigned int i;
 	pointer head;
 	pointer tail;
 	pointer next;
+
+	node_nums = malloc(num_threads * sizeof(*node_nums));
+	for (i = 0; i < num_threads; i++)
+		node_nums[i] = 2 + i;
 
 	/* initialize queue */
 	head = MAKE_POINTER(1, 0);

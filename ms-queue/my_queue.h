@@ -19,17 +19,13 @@ typedef struct node {
 	pointer_t next;
 } node_t;
 
-typedef struct private {
-	unsigned int node;
-} private_t;
-
-typedef struct shared_mem {
+typedef struct {
 	pointer_t head;
 	pointer_t tail;
 	node_t nodes[MAX_NODES + 1];
 } queue_t;
 
-void init_private(int pid);
-void init_queue(queue_t *q);
+void init_queue(queue_t *q, int num_threads);
 void enqueue(queue_t *q, unsigned int val);
 unsigned int dequeue(queue_t *q);
+int get_thread_num();
