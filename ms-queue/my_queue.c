@@ -1,15 +1,13 @@
 #include "main.h"
 
-extern unsigned pid;
-extern unsigned iterations;
-extern unsigned initial_nodes;
+extern unsigned int iterations;
 extern private_t private;
-extern shared_mem_t* smp;
+extern shared_mem_t *smp;
 
-void init_private()
+void init_private(int pid)
 {
-	private.node = 2 + initial_nodes + pid;
-	private.value = 1 + initial_nodes + (pid * iterations);
+	private.node = 2 + pid;
+	private.value = 1 + (pid * iterations);
 
 }
 
@@ -17,114 +15,116 @@ void init_memory()
 {
 }
 
-static unsigned new_node()
+static unsigned int new_node()
 {
 	return private.node;
 }
 
-static void reclaim(unsigned node)
+static void reclaim(unsigned int node)
 {
 	private.node = node;
 }
 
 void init_queue()
 {
-	unsigned i;
+	unsigned int i;
+	pointer head;
+	pointer tail;
+	pointer next;
 
 	/* initialize queue */
-	smp->head.sep.ptr = 1;
-	smp->head.sep.count = 0;
-	smp->tail.sep.ptr = 1;
-	smp->tail.sep.count = 0;
-	smp->nodes[1].next.sep.ptr = NULL;
-	smp->nodes[1].next.sep.count = 0;
+	head = MAKE_POINTER(1, 0);
+	tail = MAKE_POINTER(1, 0);
+	next = MAKE_POINTER(0, 0); // (NULL, 0)
+
+	atomic_init(&smp->nodes[0].next, 0); // assumed inititalized in original example
+
+	atomic_store(&smp->head, head);
+	atomic_store(&smp->tail, tail);
+	atomic_store(&smp->nodes[1].next, next);
 
 	/* initialize avail list */
-	for (i=2; i<MAX_NODES; i++) {
-		smp->nodes[i].next.sep.ptr = i+1;
-		smp->nodes[i].next.sep.count = 0;
+	for (i = 2; i < MAX_NODES; i++) {
+		next = MAKE_POINTER(i + 1, 0);
+		atomic_store(&smp->nodes[i].next, next);
 	}
-	smp->nodes[MAX_NODES].next.sep.ptr = NULL;
-	smp->nodes[MAX_NODES].next.sep.count = 0;
 
-	/* initialize queue contents */
-	if (initial_nodes > 0) {
-		for (i=2; i<initial_nodes+2; i++) {
-			smp->nodes[i].value = i;
-			smp->nodes[i-1].next.sep.ptr = i;
-			smp->nodes[i].next.sep.ptr = NULL;
-		}
-		smp->head.sep.ptr = 1;
-		smp->tail.sep.ptr = 1 + initial_nodes;    
-	}
+	next = MAKE_POINTER(0, 0); // (NULL, 0)
+	atomic_store(&smp->nodes[MAX_NODES].next, next);
 }
 
-void enqueue(unsigned val)
+void enqueue(unsigned int val)
 {
-	unsigned success;
-	unsigned node;
-	pointer_t tail;
-	pointer_t next;
+	unsigned int success = 0;
+	unsigned int node;
+	pointer tail;
+	pointer next;
+	pointer tmp;
 
 	node = new_node();
 	smp->nodes[node].value = val;
-	smp->nodes[node].next.sep.ptr = NULL;
+	tmp = atomic_load(&smp->nodes[node].next);
+	set_ptr(&tmp, 0); // NULL
+	atomic_store(&smp->nodes[node].next, tmp);
 
-	for (success = FALSE; success == FALSE; ) {
-		tail.con = smp->tail.con;
-		next.con = smp->nodes[tail.sep.ptr].next.con;
-		if (tail.con == smp->tail.con) {
-			if (next.sep.ptr == NULL) {
-				success = cas(&smp->nodes[tail.sep.ptr].next, 
-						next.con,
-						MAKE_LONG(node, next.sep.count+1));
+	while (!success) {
+		tail = atomic_load(&smp->tail);
+		next = atomic_load(&smp->nodes[get_ptr(tail)].next);
+		if (tail == atomic_load(&smp->tail)) {
+			if (get_ptr(next) == 0) { // == NULL
+				pointer val = MAKE_POINTER(node, get_count(next) + 1);
+				success = atomic_compare_exchange_weak(&smp->nodes[get_ptr(tail)].next,
+						&next,
+						val);
 			}
-			if (success == FALSE) {
-				cas(&smp->tail,
-						tail.con,
-						MAKE_LONG(smp->nodes[tail.sep.ptr].next.sep.ptr,
-							tail.sep.count+1));
+			if (!success) {
+				unsigned int ptr = get_ptr(atomic_load(&smp->nodes[get_ptr(tail)].next));
+				pointer val = MAKE_POINTER(ptr,
+						get_count(tail) + 1);
+				atomic_compare_exchange_strong(&smp->tail,
+						&tail,
+						val);
 				thrd_yield();
 			}
 		}
 	}
-	cas(&smp->tail, 
-			tail.con,
-			MAKE_LONG(node, tail.sep.count+1));
+	atomic_compare_exchange_strong(&smp->tail,
+			&tail,
+			MAKE_POINTER(node, get_count(tail) + 1));
 }
 
-unsigned dequeue()
+unsigned int dequeue()
 {
-	unsigned value;
-	unsigned success;
-	pointer_t head;
-	pointer_t tail;
-	pointer_t next;
+	unsigned int value;
+	unsigned int success;
+	pointer head;
+	pointer tail;
+	pointer next;
 
 	for (success = FALSE; success == FALSE; ) {
-		head.con = smp->head.con;
-		tail.con = smp->tail.con;
-		next.con = smp->nodes[head.sep.ptr].next.con;
-		if (smp->head.con == head.con) {
-			if (head.sep.ptr == tail.sep.ptr) {
-				if (next.sep.ptr == NULL) {
-					return NULL;
+		head = atomic_load(&smp->head);
+		tail = atomic_load(&smp->tail);
+		next = atomic_load(&smp->nodes[get_ptr(head)].next);
+		if (atomic_load(&smp->head) == head) {
+			if (get_ptr(head) == get_ptr(tail)) {
+				if (get_ptr(next) == 0) { // NULL
+					return 0; // NULL
 				}
-				cas(&smp->tail,
-						tail.con,
-						MAKE_LONG(next.sep.ptr, tail.sep.count+1));
+				atomic_compare_exchange_weak(&smp->tail,
+						&tail,
+						MAKE_POINTER(get_ptr(next), get_count(tail) + 1));
 				thrd_yield();
 			} else {
-				value = smp->nodes[next.sep.ptr].value;
-				success = cas(&smp->head,
-						head.con,
-						MAKE_LONG(next.sep.ptr, head.sep.count+1));
+				value = smp->nodes[get_ptr(next)].value;
+				success = atomic_compare_exchange_weak(&smp->head,
+						&head,
+						MAKE_POINTER(get_ptr(next), get_count(head) + 1));
 				if (success == FALSE) {
 					thrd_yield();
 				}
 			}
 		}
 	}
-	reclaim(head.sep.ptr);
+	reclaim(get_ptr(head));
 	return value;
 }
