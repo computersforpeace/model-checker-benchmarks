@@ -1,5 +1,6 @@
 #include <threads.h>
 #include <stdlib.h>
+#include "librace.h"
 
 #include "my_queue.h"
 
@@ -54,7 +55,7 @@ void enqueue(queue_t *q, unsigned int val)
 	pointer tmp;
 
 	node = new_node();
-	q->nodes[node].value = val;
+	store_32(&q->nodes[node].value, val);
 	tmp = atomic_load(&q->nodes[node].next);
 	set_ptr(&tmp, 0); // NULL
 	atomic_store(&q->nodes[node].next, tmp);
@@ -105,7 +106,7 @@ unsigned int dequeue(queue_t *q)
 						MAKE_POINTER(get_ptr(next), get_count(tail) + 1));
 				thrd_yield();
 			} else {
-				value = q->nodes[get_ptr(next)].value;
+				value = load_32(&q->nodes[get_ptr(next)].value);
 				success = atomic_compare_exchange_weak(&q->head,
 						&head,
 						MAKE_POINTER(get_ptr(next), get_count(head) + 1));

@@ -63,7 +63,6 @@ int user_main(int argc, char **argv)
 	int *param;
 
 	parse_args(argc, argv);
-	iterations = (iterations + (procs >> 1)) / procs;
 
 	queue = calloc(1, sizeof(*queue));
 	assert(queue);
