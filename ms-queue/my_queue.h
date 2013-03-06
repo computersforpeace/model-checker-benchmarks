@@ -11,8 +11,8 @@ typedef atomic_ullong pointer_t;
 
 static inline void set_count(pointer *p, unsigned int val) { *p = (*p & ~COUNT_MASK) | ((pointer)val << 32); }
 static inline void set_ptr(pointer *p, unsigned int val) { *p = (*p & ~PTR_MASK) | val; }
-static inline unsigned int get_count(pointer p) { return p & PTR_MASK; }
-static inline unsigned int get_ptr(pointer p) { return (p & COUNT_MASK) >> 32; }
+static inline unsigned int get_count(pointer p) { return (p & COUNT_MASK) >> 32; }
+static inline unsigned int get_ptr(pointer p) { return p & PTR_MASK; }
 
 typedef struct node {
 	unsigned int value;

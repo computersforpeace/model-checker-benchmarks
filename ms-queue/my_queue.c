@@ -31,8 +31,6 @@ void init_queue(queue_t *q, int num_threads)
 	tail = MAKE_POINTER(1, 0);
 	next = MAKE_POINTER(0, 0); // (NULL, 0)
 
-	atomic_init(&q->nodes[0].next, 0); // assumed inititalized in original example
-
 	atomic_store(&q->head, head);
 	atomic_store(&q->tail, tail);
 	atomic_store(&q->nodes[1].next, next);
