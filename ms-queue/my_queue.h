@@ -1,10 +1,6 @@
 #include <stdatomic.h>
 
-#define TRUE				1
-#define FALSE				0
-
 #define MAX_NODES			0xf
-#define MAX_SERIAL			10000
 
 typedef unsigned long long pointer;
 typedef atomic_ullong pointer_t;
@@ -21,25 +17,19 @@ static inline unsigned int get_ptr(pointer p) { return (p & COUNT_MASK) >> 32; }
 typedef struct node {
 	unsigned int value;
 	pointer_t next;
-	unsigned int foo[30];
 } node_t;
 
 typedef struct private {
 	unsigned int node;
-	unsigned int value;
-	unsigned int serial[MAX_SERIAL];
 } private_t;
 
 typedef struct shared_mem {
 	pointer_t head;
-	unsigned int foo1[31];
 	pointer_t tail;
-	unsigned int foo2[31];
-	node_t nodes[MAX_NODES+1];
-	unsigned int serial;
-} shared_mem_t;
+	node_t nodes[MAX_NODES + 1];
+} queue_t;
 
 void init_private(int pid);
-void init_memory();
-void init_queue();
-unsigned int dequeue();
+void init_queue(queue_t *q);
+void enqueue(queue_t *q, unsigned int val);
+unsigned int dequeue(queue_t *q);

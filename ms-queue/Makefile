@@ -2,8 +2,8 @@ include ../benchmarks.mk
 
 TESTNAME = main
 
-HEADERS = main.h my_queue.h
-OBJECTS = main.o my_queue.o args.o
+HEADERS = my_queue.h
+OBJECTS = main.o my_queue.o
 
 all: $(TESTNAME)
 
