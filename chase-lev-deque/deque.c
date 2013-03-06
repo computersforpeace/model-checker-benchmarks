@@ -1,26 +1,28 @@
 #include <stdatomic.h>
 #include <inttypes.h>
+#include "deque.h"
+#include <stdlib.h>
 
-typedef struct {
-	atomic_size_t size;
-	atomic_int buffer[];
-} Array;
-
-typedef struct {
-	atomic_size_t top, bottom;
-	atomic_uintptr_t array; /* Atomic(Array *) */
-} Deque;
+Deque * create() {
+	Deque * q = (Deque *) calloc(1, sizeof(Deque));
+	Array * a = (Array *) calloc(1, sizeof(Array)+2*sizeof(atomic_int));
+	atomic_store_explicit(&q->array, a, memory_order_relaxed);
+	atomic_store_explicit(&q->top, 0, memory_order_relaxed);
+	atomic_store_explicit(&q->bottom, 0, memory_order_relaxed);
+	atomic_store_explicit(&a->size, 2, memory_order_relaxed);
+	return q;
+}
 
 int take(Deque *q) {
 	size_t b = atomic_load_explicit(&q->bottom, memory_order_relaxed) - 1;
-	Array *a = atomic_load_explicit(&q->array, memory_order_relaxed);
+	Array *a = (Array *) atomic_load_explicit(&q->array, memory_order_relaxed);
 	atomic_store_explicit(&q->bottom, b, memory_order_relaxed);
 	atomic_thread_fence(memory_order_seq_cst);
 	size_t t = atomic_load_explicit(&q->top, memory_order_relaxed);
 	int x;
 	if (t <= b) {
 		/* Non-empty queue. */
-		x = atomic_load_explicit(&a->buffer[b % a->size], memory_order_relaxed);
+		x = atomic_load_explicit(&a->buffer[b % atomic_load_explicit(&a->size,memory_order_relaxed)], memory_order_relaxed);
 		if (t == b) {
 			/* Single last element in queue. */
 			if (!atomic_compare_exchange_strong_explicit(&q->top, &t, t + 1, memory_order_seq_cst, memory_order_relaxed))
@@ -35,13 +37,31 @@ int take(Deque *q) {
 	return x;
 }
 
+void resize(Deque *q) {
+	Array *a = (Array *) atomic_load_explicit(&q->array, memory_order_relaxed);
+	size_t size=atomic_load_explicit(&a->size, memory_order_relaxed);
+	size_t new_size=size << 1;
+	Array *new_a = (Array *) calloc(1, new_size * sizeof(atomic_int) + sizeof(Array));
+	size_t top=atomic_load_explicit(&q->top, memory_order_relaxed);
+	size_t bottom=atomic_load_explicit(&q->bottom, memory_order_relaxed);
+	atomic_store_explicit(&new_a->size, new_size, memory_order_relaxed);
+	size_t i;
+	for(i=top; i < bottom; i++) {
+		atomic_store_explicit(&new_a->buffer[i], atomic_load_explicit(&a->buffer[i], memory_order_relaxed), memory_order_relaxed);
+	}
+	atomic_store_explicit(&q->array, new_a, memory_order_relaxed);
+}
+
 void push(Deque *q, int x) {
 	size_t b = atomic_load_explicit(&q->bottom, memory_order_relaxed);
 	size_t t = atomic_load_explicit(&q->top, memory_order_acquire);
-	Array *a = atomic_load_explicit(&q->array, memory_order_relaxed);
-	if (b - t > a->size - 1) /* Full queue. */
+	Array *a = (Array *) atomic_load_explicit(&q->array, memory_order_relaxed);
+	if (b - t > atomic_load_explicit(&a->size, memory_order_relaxed) - 1) /* Full queue. */ {
 		resize(q);
-	atomic_store_explicit(&a->buffer[b % a->size], x, memory_order_relaxed);
+		//Bug in paper...should have next line...
+		a = (Array *) atomic_load_explicit(&q->array, memory_order_relaxed);
+	}
+	atomic_store_explicit(&a->buffer[b % atomic_load_explicit(&a->size, memory_order_relaxed)], x, memory_order_relaxed);
 	atomic_thread_fence(memory_order_release);
 	atomic_store_explicit(&q->bottom, b + 1, memory_order_relaxed);
 }
@@ -53,8 +73,8 @@ int steal(Deque *q) {
 	int x = EMPTY;
 	if (t < b) {
 		/* Non-empty queue. */
-		Array *a = atomic_load_explicit(&q->array, memory_order_relaxed);
-		x = atomic_load_explicit(&a->buffer[t % a->size], memory_order_relaxed);
+		Array *a = (Array *) atomic_load_explicit(&q->array, memory_order_relaxed);
+		x = atomic_load_explicit(&a->buffer[t % atomic_load_explicit(&a->size, memory_order_relaxed)], memory_order_relaxed);
 		if (!atomic_compare_exchange_strong_explicit(&q->top, &t, t + 1, memory_order_seq_cst, memory_order_relaxed))
 			/* Failed race. */
 			return ABORT;
