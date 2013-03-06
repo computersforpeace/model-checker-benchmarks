@@ -43,15 +43,17 @@ static void parse_args(int argc, char **argv)
 
 static void main_task(void *param)
 {
-	unsigned i, j;
-	unsigned val;
+	unsigned int i, j;
+	unsigned int val;
 	int pid = *((int *)param);
 
 	for (i = 0; i < iterations; i++) {
 		val = 1 + pid * iterations + i;
+		printf("worker %d, enqueueing: %u\n", pid, val);
 		enqueue(queue, val);
 
 		val = dequeue(queue);
+		printf("worker %d, dequeued: %u\n", pid, val);
 	}
 }
 

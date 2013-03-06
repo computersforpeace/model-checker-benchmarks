@@ -66,18 +66,16 @@ void enqueue(queue_t *q, unsigned int val)
 		next = atomic_load(&q->nodes[get_ptr(tail)].next);
 		if (tail == atomic_load(&q->tail)) {
 			if (get_ptr(next) == 0) { // == NULL
-				pointer val = MAKE_POINTER(node, get_count(next) + 1);
+				pointer value = MAKE_POINTER(node, get_count(next) + 1);
 				success = atomic_compare_exchange_weak(&q->nodes[get_ptr(tail)].next,
-						&next,
-						val);
+						&next, value);
 			}
 			if (!success) {
 				unsigned int ptr = get_ptr(atomic_load(&q->nodes[get_ptr(tail)].next));
-				pointer val = MAKE_POINTER(ptr,
+				pointer value = MAKE_POINTER(ptr,
 						get_count(tail) + 1);
 				atomic_compare_exchange_strong(&q->tail,
-						&tail,
-						val);
+						&tail, value);
 				thrd_yield();
 			}
 		}
@@ -104,7 +102,7 @@ unsigned int dequeue(queue_t *q)
 				if (get_ptr(next) == 0) { // NULL
 					return 0; // NULL
 				}
-				atomic_compare_exchange_weak(&q->tail,
+				atomic_compare_exchange_strong(&q->tail,
 						&tail,
 						MAKE_POINTER(get_ptr(next), get_count(tail) + 1));
 				thrd_yield();
