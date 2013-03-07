@@ -2,8 +2,8 @@ include ../benchmarks.mk
 
 TESTNAME = main
 
-HEADERS = 
-OBJECTS = deque.o
+HEADERS = deque.h
+OBJECTS = main.o deque.o
 
 all: $(TESTNAME)
 

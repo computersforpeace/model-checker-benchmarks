@@ -50,6 +50,7 @@ void resize(Deque *q) {
 		atomic_store_explicit(&new_a->buffer[i % new_size], atomic_load_explicit(&a->buffer[i % size], memory_order_relaxed), memory_order_relaxed);
 	}
 	atomic_store_explicit(&q->array, new_a, memory_order_relaxed);
+	printf("resize\n");
 }
 
 void push(Deque *q, int x) {
