@@ -40,6 +40,7 @@ int user_main(int argc, char **argv)
 		correct=false;
 	if (!correct)
 		printf("a=%d b=%d c=%d\n",a,b,c);
+	MODEL_ASSERT(correct);
 
 	return 0;
 }
