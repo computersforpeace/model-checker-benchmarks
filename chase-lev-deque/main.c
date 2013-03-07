@@ -11,7 +11,9 @@ int a;
 int b;
 
 static void task(void * param) {
-	a=steal(q);
+	do {
+		a=steal(q);
+	} while(a==EMPTY);
 }
 
 int user_main(int argc, char **argv)
@@ -21,9 +23,7 @@ int user_main(int argc, char **argv)
 	thrd_create(&t, task, 0);
 	push(q, 1);
 	push(q, 2);
-	do {
-		b=take(q);
-	}	while(b==EMPTY);
+	b=take(q);
 	thrd_join(t);
 	if (a+b!=3)
 		printf("a=%d b=%d\n",a,b);
