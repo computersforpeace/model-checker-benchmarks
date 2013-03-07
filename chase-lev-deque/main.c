@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <threads.h>
 #include <stdatomic.h>
+#include <stdio.h>
+
+#include "model-assert.h"
 
 #include "deque.h"
 
@@ -25,7 +28,9 @@ int user_main(int argc, char **argv)
 	push(q, 2);
 	b=take(q);
 	thrd_join(t);
-	if (a+b!=3)
-		printf("a=%d b=%d\n",a,b);
+
+	printf("a=%d b=%d\n",a,b);
+	MODEL_ASSERT(a + b == 3);
+
 	return 0;
 }
