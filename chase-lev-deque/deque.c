@@ -47,7 +47,7 @@ void resize(Deque *q) {
 	atomic_store_explicit(&new_a->size, new_size, memory_order_relaxed);
 	size_t i;
 	for(i=top; i < bottom; i++) {
-		atomic_store_explicit(&new_a->buffer[i], atomic_load_explicit(&a->buffer[i], memory_order_relaxed), memory_order_relaxed);
+		atomic_store_explicit(&new_a->buffer[i % new_size], atomic_load_explicit(&a->buffer[i % size], memory_order_relaxed), memory_order_relaxed);
 	}
 	atomic_store_explicit(&q->array, new_a, memory_order_relaxed);
 }
