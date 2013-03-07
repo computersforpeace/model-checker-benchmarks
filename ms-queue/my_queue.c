@@ -59,18 +59,18 @@ void enqueue(queue_t *q, unsigned int val)
 
 	node = new_node();
 	store_32(&q->nodes[node].value, val);
-	tmp = atomic_load(&q->nodes[node].next);
+	tmp = atomic_load_explicit(&q->nodes[node].next, memory_order_relaxed);
 	set_ptr(&tmp, 0); // NULL
-	atomic_store(&q->nodes[node].next, tmp);
+	atomic_store_explicit(&q->nodes[node].next, tmp, memory_order_relaxed);
 
 	while (!success) {
-		tail = atomic_load(&q->tail);
-		next = atomic_load(&q->nodes[get_ptr(tail)].next);
+		tail = atomic_load_explicit(&q->tail, memory_order_relaxed);
+		next = atomic_load_explicit(&q->nodes[get_ptr(tail)].next, memory_order_relaxed);
 		if (tail == atomic_load(&q->tail)) {
 			if (get_ptr(next) == 0) { // == NULL
 				pointer value = MAKE_POINTER(node, get_count(next) + 1);
-				success = atomic_compare_exchange_weak(&q->nodes[get_ptr(tail)].next,
-						&next, value);
+				success = atomic_compare_exchange_weak_explicit(&q->nodes[get_ptr(tail)].next,
+						&next, value, memory_order_release, memory_order_release);
 			}
 			if (!success) {
 				unsigned int ptr = get_ptr(atomic_load(&q->nodes[get_ptr(tail)].next));
@@ -82,9 +82,10 @@ void enqueue(queue_t *q, unsigned int val)
 			}
 		}
 	}
-	atomic_compare_exchange_strong(&q->tail,
+	atomic_compare_exchange_strong_explicit(&q->tail,
 			&tail,
-			MAKE_POINTER(node, get_count(tail) + 1));
+			MAKE_POINTER(node, get_count(tail) + 1),
+			memory_order_release, memory_order_release);
 }
 
 unsigned int dequeue(queue_t *q)
@@ -96,9 +97,9 @@ unsigned int dequeue(queue_t *q)
 	pointer next;
 
 	while (!success) {
-		head = atomic_load(&q->head);
-		tail = atomic_load(&q->tail);
-		next = atomic_load(&q->nodes[get_ptr(head)].next);
+		head = atomic_load_explicit(&q->head, memory_order_relaxed);
+		tail = atomic_load_explicit(&q->tail, memory_order_relaxed);
+		next = atomic_load_explicit(&q->nodes[get_ptr(head)].next, memory_order_relaxed);
 		if (atomic_load(&q->head) == head) {
 			if (get_ptr(head) == get_ptr(tail)) {
 				if (get_ptr(next) == 0) { // NULL
