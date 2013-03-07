@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include "deque.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 Deque * create() {
 	Deque * q = (Deque *) calloc(1, sizeof(Deque));

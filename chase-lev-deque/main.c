@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <threads.h>
 #include <stdatomic.h>
-#include <stdio.h>
 
 #include "model-assert.h"
 
