@@ -1,6 +1,7 @@
 #include <threads.h>
 #include <stdlib.h>
 #include "librace.h"
+#include "model-assert.h"
 
 #include "my_queue.h"
 
@@ -8,46 +9,68 @@
 #define release memory_order_release
 #define acquire memory_order_acquire
 
-static unsigned int *node_nums;
+#define MAX_FREELIST 4 /* Each thread can own up to MAX_FREELIST free nodes */
+#define INITIAL_FREE 2 /* Each thread starts with INITIAL_FREE free nodes */
 
+static unsigned int (*free_lists)[MAX_FREELIST];
+
+/* Search this thread's free list for a "new" node */
 static unsigned int new_node()
 {
-	return node_nums[get_thread_num()];
+	int i;
+	int t = get_thread_num();
+	for (i = 0; i < MAX_FREELIST; i++) {
+		unsigned int node = load_32(&free_lists[t][i]);
+		if (node) {
+			store_32(&free_lists[t][i], 0);
+			return node;
+		}
+	}
+	/* free_list is empty? */
+	MODEL_ASSERT(0);
+	return 0;
 }
 
+/* Place this node index back on this thread's free list */
 static void reclaim(unsigned int node)
 {
-	node_nums[get_thread_num()] = node;
+	int i;
+	int t = get_thread_num();
+
+	/* Don't reclaim NULL node */
+	MODEL_ASSERT(node);
+
+	for (i = 0; i < MAX_FREELIST; i++) {
+		/* Should never race with our own thread here */
+		unsigned int idx = load_32(&free_lists[t][i]);
+
+		/* Found empty spot in free list */
+		if (idx == 0) {
+			store_32(&free_lists[t][i], node);
+			return;
+		}
+	}
+	/* free list is full? */
+	MODEL_ASSERT(0);
 }
 
 void init_queue(queue_t *q, int num_threads)
 {
-	unsigned int i;
-	pointer head;
-	pointer tail;
-	pointer next;
+	int i, j;
 
-	node_nums = malloc(num_threads * sizeof(*node_nums));
-	for (i = 0; i < num_threads; i++)
-		node_nums[i] = 2 + i;
-
-	/* initialize queue */
-	head = MAKE_POINTER(1, 0);
-	tail = MAKE_POINTER(1, 0);
-	next = MAKE_POINTER(0, 0); // (NULL, 0)
-
-	atomic_init(&q->head, head);
-	atomic_init(&q->tail, tail);
-	atomic_init(&q->nodes[1].next, next);
-
-	/* initialize avail list */
-	for (i = 2; i < MAX_NODES; i++) {
-		next = MAKE_POINTER(i + 1, 0);
-		atomic_init(&q->nodes[i].next, next);
+	/* Initialize each thread's free list with INITIAL_FREE NULL "pointers" */
+	free_lists = malloc(num_threads * sizeof(*free_lists));
+	for (i = 0; i < num_threads; i++) {
+		for (j = 0; j < INITIAL_FREE; j++) {
+			free_lists[i][j] = 2 + i * MAX_FREELIST + j;
+			atomic_init(&q->nodes[free_lists[i][j]].next, MAKE_POINTER(0, 0));
+		}
 	}
 
-	next = MAKE_POINTER(0, 0); // (NULL, 0)
-	atomic_init(&q->nodes[MAX_NODES].next, next);
+	/* initialize queue */
+	atomic_init(&q->head, MAKE_POINTER(1, 0));
+	atomic_init(&q->tail, MAKE_POINTER(1, 0));
+	atomic_init(&q->nodes[1].next, MAKE_POINTER(0, 0));
 }
 
 void enqueue(queue_t *q, unsigned int val)
