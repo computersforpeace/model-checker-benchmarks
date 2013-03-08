@@ -44,7 +44,6 @@ int user_main(int argc, char **argv)
 	int i;
 	int *param;
 	unsigned int in_sum = 0, out_sum = 0;
-	int zero = 0;
 
 	queue = calloc(1, sizeof(*queue));
 	MODEL_ASSERT(queue);
@@ -69,12 +68,9 @@ int user_main(int argc, char **argv)
 	}
 	for (i = 0; i < num_threads; i++)
 		printf("input[%d] = %u\n", i, input[i]);
-	for (i = 0; i < num_threads; i++) {
-		if (output[i] == 0)
-			zero = 1; /* A zero result means queue was empty */
+	for (i = 0; i < num_threads; i++)
 		printf("output[%d] = %u\n", i, output[i]);
-	}
-	MODEL_ASSERT(in_sum == out_sum || zero);
+	MODEL_ASSERT(in_sum == out_sum);
 
 	free(param);
 	free(threads);
