@@ -94,15 +94,15 @@ void enqueue(queue_t *q, unsigned int val)
 			if (get_ptr(next) == 0) { // == NULL
 				pointer value = MAKE_POINTER(node, get_count(next) + 1);
 				success = atomic_compare_exchange_strong_explicit(&q->nodes[get_ptr(tail)].next,
-						&next, value, memory_order_acq_rel, memory_order_acq_rel);
+						&next, value, release, release);
 			}
 			if (!success) {
-				unsigned int ptr = get_ptr(atomic_load_explicit(&q->nodes[get_ptr(tail)].next, memory_order_seq_cst));
+				unsigned int ptr = get_ptr(atomic_load_explicit(&q->nodes[get_ptr(tail)].next, acquire));
 				pointer value = MAKE_POINTER(ptr,
 						get_count(tail) + 1);
 				atomic_compare_exchange_strong_explicit(&q->tail,
 						&tail, value,
-						memory_order_acq_rel, memory_order_acq_rel);
+						release, release);
 				thrd_yield();
 			}
 		}
@@ -110,7 +110,7 @@ void enqueue(queue_t *q, unsigned int val)
 	atomic_compare_exchange_strong_explicit(&q->tail,
 			&tail,
 			MAKE_POINTER(node, get_count(tail) + 1),
-			memory_order_acq_rel, memory_order_acq_rel);
+			release, release);
 }
 
 unsigned int dequeue(queue_t *q)
@@ -123,7 +123,7 @@ unsigned int dequeue(queue_t *q)
 
 	while (!success) {
 		head = atomic_load_explicit(&q->head, acquire);
-		tail = atomic_load_explicit(&q->tail, acquire);
+		tail = atomic_load_explicit(&q->tail, relaxed);
 		next = atomic_load_explicit(&q->nodes[get_ptr(head)].next, acquire);
 		if (atomic_load_explicit(&q->head, relaxed) == head) {
 			if (get_ptr(head) == get_ptr(tail)) {
@@ -133,14 +133,14 @@ unsigned int dequeue(queue_t *q)
 				atomic_compare_exchange_strong_explicit(&q->tail,
 						&tail,
 						MAKE_POINTER(get_ptr(next), get_count(tail) + 1),
-						memory_order_acq_rel, memory_order_acq_rel);
+						release, release);
 				thrd_yield();
 			} else {
 				value = load_32(&q->nodes[get_ptr(next)].value);
 				success = atomic_compare_exchange_strong_explicit(&q->head,
 						&head,
 						MAKE_POINTER(get_ptr(next), get_count(head) + 1),
-						memory_order_acq_rel, memory_order_acq_rel);
+						release, release);
 				if (!success)
 					thrd_yield();
 			}
