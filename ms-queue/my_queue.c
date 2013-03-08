@@ -70,7 +70,7 @@ void enqueue(queue_t *q, unsigned int val)
 	while (!success) {
 		tail = atomic_load_explicit(&q->tail, acquire);
 		next = atomic_load_explicit(&q->nodes[get_ptr(tail)].next, acquire);
-		if (tail == atomic_load_explicit(&q->tail, acquire)) {
+		if (tail == atomic_load_explicit(&q->tail, relaxed)) {
 			if (get_ptr(next) == 0) { // == NULL
 				pointer value = MAKE_POINTER(node, get_count(next) + 1);
 				success = atomic_compare_exchange_strong_explicit(&q->nodes[get_ptr(tail)].next,
@@ -105,7 +105,7 @@ unsigned int dequeue(queue_t *q)
 		head = atomic_load_explicit(&q->head, acquire);
 		tail = atomic_load_explicit(&q->tail, acquire);
 		next = atomic_load_explicit(&q->nodes[get_ptr(head)].next, acquire);
-		if (atomic_load_explicit(&q->head, acquire) == head) {
+		if (atomic_load_explicit(&q->head, relaxed) == head) {
 			if (get_ptr(head) == get_ptr(tail)) {
 				if (get_ptr(next) == 0) { // NULL
 					return 0; // NULL
