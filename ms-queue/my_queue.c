@@ -71,13 +71,13 @@ void enqueue(queue_t *q, unsigned int val)
 	while (!success) {
 		//tail isn't actually synchronization point
 		tail = atomic_load_explicit(&q->tail, relaxed);
-		//acquire reference
-		next = atomic_load_explicit(&q->nodes[get_ptr(tail)].next, relaxed);
-		if (tail == atomic_load_explicit(&q->tail, relaxed)) {
+		//acquire reference...
+		next = atomic_load_explicit(&q->nodes[get_ptr(tail)].next, memory_order_seq_cst);
+		if (tail == atomic_load_explicit(&q->tail, memory_order_seq_cst)) {
 			if (get_ptr(next) == 0) { // == NULL
 				pointer value = MAKE_POINTER(node, get_count(next) + 1);
 				success = atomic_compare_exchange_strong_explicit(&q->nodes[get_ptr(tail)].next,
-						&next, value, memory_order_release, memory_order_release);
+						&next, value, memory_order_seq_cst, memory_order_seq_cst);
 			}
 			if (!success) {
 				unsigned int ptr = get_ptr(atomic_load_explicit(&q->nodes[get_ptr(tail)].next, memory_order_relaxed));
@@ -85,14 +85,14 @@ void enqueue(queue_t *q, unsigned int val)
 						get_count(tail) + 1);
 				atomic_compare_exchange_strong_explicit(&q->tail,
 						&tail, value,
-						memory_order_relaxed, memory_order_relaxed);
+						memory_order_seq_cst, memory_order_seq_cst);
 			}
 		}
 	}
 	atomic_compare_exchange_strong_explicit(&q->tail,
 			&tail,
 			MAKE_POINTER(node, get_count(tail) + 1),
-			memory_order_relaxed, memory_order_relaxed);
+			memory_order_seq_cst, memory_order_seq_cst);
 }
 
 unsigned int dequeue(queue_t *q)
@@ -104,10 +104,10 @@ unsigned int dequeue(queue_t *q)
 	pointer next;
 
 	while (!success) {
-		head = atomic_load_explicit(&q->head, relaxed);
-		tail = atomic_load_explicit(&q->tail, relaxed);
-		next = atomic_load_explicit(&q->nodes[get_ptr(head)].next, acquire);
-		if (atomic_load_explicit(&q->head, relaxed) == head) {
+		head = atomic_load_explicit(&q->head, memory_order_seq_cst);
+		tail = atomic_load_explicit(&q->tail, memory_order_seq_cst);
+		next = atomic_load_explicit(&q->nodes[get_ptr(head)].next, memory_order_seq_cst);
+		if (atomic_load_explicit(&q->head, memory_order_seq_cst) == head) {
 			if (get_ptr(head) == get_ptr(tail)) {
 				if (get_ptr(next) == 0) { // NULL
 					return 0; // NULL
@@ -115,13 +115,13 @@ unsigned int dequeue(queue_t *q)
 				atomic_compare_exchange_strong_explicit(&q->tail,
 						&tail,
 						MAKE_POINTER(get_ptr(next), get_count(tail) + 1),
-						memory_order_relaxed, memory_order_relaxed);
+						memory_order_seq_cst, memory_order_seq_cst);
 			} else {
 				value = load_32(&q->nodes[get_ptr(next)].value);
 				success = atomic_compare_exchange_strong_explicit(&q->head,
 						&head,
 						MAKE_POINTER(get_ptr(next), get_count(head) + 1),
-						memory_order_relaxed, memory_order_relaxed);
+						memory_order_seq_cst, memory_order_seq_cst);
 			}
 		}
 	}
