@@ -31,9 +31,6 @@ void init_queue(queue_t *q, int num_threads)
 	for (i = 0; i < num_threads; i++)
 		node_nums[i] = 2 + i;
 
-	/* Note: needed to add this init manually */
-	atomic_init(&q->nodes[0].next, 0);
-
 	/* initialize queue */
 	head = MAKE_POINTER(1, 0);
 	tail = MAKE_POINTER(1, 0);
