@@ -12,6 +12,8 @@
 #define MAX_FREELIST 4 /* Each thread can own up to MAX_FREELIST free nodes */
 #define INITIAL_FREE 2 /* Each thread starts with INITIAL_FREE free nodes */
 
+#define POISON_IDX 0x666
+
 static unsigned int (*free_lists)[MAX_FREELIST];
 
 /* Search this thread's free list for a "new" node */
@@ -58,12 +60,13 @@ void init_queue(queue_t *q, int num_threads)
 {
 	int i, j;
 
-	/* Initialize each thread's free list with INITIAL_FREE NULL "pointers" */
+	/* Initialize each thread's free list with INITIAL_FREE pointers */
+	/* The actual nodes are initialized with poison indexes */
 	free_lists = malloc(num_threads * sizeof(*free_lists));
 	for (i = 0; i < num_threads; i++) {
 		for (j = 0; j < INITIAL_FREE; j++) {
 			free_lists[i][j] = 2 + i * MAX_FREELIST + j;
-			atomic_init(&q->nodes[free_lists[i][j]].next, MAKE_POINTER(0, 0));
+			atomic_init(&q->nodes[free_lists[i][j]].next, MAKE_POINTER(POISON_IDX, 0));
 		}
 	}
 
@@ -91,6 +94,10 @@ void enqueue(queue_t *q, unsigned int val)
 		tail = atomic_load_explicit(&q->tail, acquire);
 		next = atomic_load_explicit(&q->nodes[get_ptr(tail)].next, acquire);
 		if (tail == atomic_load_explicit(&q->tail, relaxed)) {
+
+			/* Check for uninitialized 'next' */
+			MODEL_ASSERT(get_ptr(next) != POISON_IDX);
+
 			if (get_ptr(next) == 0) { // == NULL
 				pointer value = MAKE_POINTER(node, get_count(next) + 1);
 				success = atomic_compare_exchange_strong_explicit(&q->nodes[get_ptr(tail)].next,
@@ -127,6 +134,10 @@ unsigned int dequeue(queue_t *q)
 		next = atomic_load_explicit(&q->nodes[get_ptr(head)].next, acquire);
 		if (atomic_load_explicit(&q->head, relaxed) == head) {
 			if (get_ptr(head) == get_ptr(tail)) {
+
+				/* Check for uninitialized 'next' */
+				MODEL_ASSERT(get_ptr(next) != POISON_IDX);
+
 				if (get_ptr(next) == 0) { // NULL
 					return 0; // NULL
 				}
