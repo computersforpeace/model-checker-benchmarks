@@ -26,7 +26,7 @@ TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
 TESTS+=" mpmc-queue/mpmc-queue-noinit"
 TESTS+=" linuxrwlocks/linuxrwlocks"
 
-MODEL_ARGS="-f 10 -m 2 -e 1"
+MODEL_ARGS="-y -m 2"
 COUNT=0
 
 function run_test {

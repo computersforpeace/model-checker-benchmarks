@@ -57,7 +57,7 @@ public:
 			// wait on predecessor setting my flag -
 			rl::linear_backoff bo;
 			while ( me->gate.load(std::mo_acquire) ) {
-				bo.yield();
+				thrd_yield();
 			}
 		}
 	}
@@ -80,7 +80,7 @@ public:
 				next = me->next.load(std::mo_acquire);
 				if ( next != NULL )
 					break;
-				bo.yield();
+				thrd_yield();
 			}
 		}
 

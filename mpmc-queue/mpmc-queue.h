@@ -43,7 +43,7 @@ public:
 		// (*1)
 		rl::backoff bo;
 		while ( (m_written.load(mo_acquire) & 0xFFFF) != wr ) {
-			bo.yield();
+			thrd_yield();
 		}
 
 		t_element * p = & ( m_array[ rd % t_size ] );
@@ -74,7 +74,7 @@ public:
 		// (*1)
 		rl::backoff bo;
 		while ( (m_read.load(mo_acquire) & 0xFFFF) != rd ) {
-			bo.yield();
+			thrd_yield();
 		}
 
 		t_element * p = & ( m_array[ wr % t_size ] );

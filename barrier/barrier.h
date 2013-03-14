@@ -18,7 +18,7 @@ class spinning_barrier {
 		} else {
 			/* Run in circles and scream like a little girl.  */
 			while (step_.load () == step)
-				;
+				thrd_yield();
 			return false;
 		}
 	}

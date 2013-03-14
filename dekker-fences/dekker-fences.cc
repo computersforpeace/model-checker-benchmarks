@@ -27,10 +27,12 @@ void p0(void *arg)
 			flag0.store(false,std::memory_order_relaxed);
 			while (turn.load(std::memory_order_relaxed) != 0)
 			{
+				thrd_yield();
 			}
 			flag0.store(true,std::memory_order_relaxed);
 			std::atomic_thread_fence(std::memory_order_seq_cst);
-		}
+		} else
+			thrd_yield();
 	}
 	std::atomic_thread_fence(std::memory_order_acquire);
 
@@ -54,10 +56,12 @@ void p1(void *arg)
 			flag1.store(false,std::memory_order_relaxed);
 			while (turn.load(std::memory_order_relaxed) != 1)
 			{
+				thrd_yield();
 			}
 			flag1.store(true,std::memory_order_relaxed);
 			std::atomic_thread_fence(std::memory_order_seq_cst);
-		}
+		} else
+			thrd_yield();
 	}
 	std::atomic_thread_fence(std::memory_order_acquire);
 
