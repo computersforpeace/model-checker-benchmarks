@@ -23,6 +23,8 @@ TESTS+=" spsc-bugfix/spsc-queue"
 TESTS+=" dekker-fences/dekker-fences"
 TESTS+=" mpmc-queue/mpmc-2r1w"
 TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
+TESTS+=" mpmc-queue/mpmc-queue-rdwr"
+TESTS+=" mpmc-queue/mpmc-rdwr-noinit"
 TESTS+=" mpmc-queue/mpmc-queue-noinit"
 TESTS+=" linuxrwlocks/linuxrwlocks"
 

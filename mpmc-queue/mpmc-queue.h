@@ -38,6 +38,8 @@ public:
 
 			if ( m_rdwr.compare_exchange_weak(rdwr,rdwr+(1<<16),mo_acq_rel) )
 				break;
+			else
+				thrd_yield();
 		}
 
 		// (*1)
@@ -69,6 +71,8 @@ public:
 
 			if ( m_rdwr.compare_exchange_weak(rdwr,(rd<<16) | ((wr+1)&0xFFFF),mo_acq_rel) )
 				break;
+			else
+				thrd_yield();
 		}
 
 		// (*1)

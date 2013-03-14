@@ -24,8 +24,21 @@ void threadB(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
 	}
 }
 
+void threadC(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
+{
+	int32_t *bin = queue->write_prepare();
+	store_32(bin, 1);
+	queue->write_publish();
+
+	while (bin = queue->read_fetch()) {
+		printf("Read: %d\n", load_32(bin));
+		queue->read_consume();
+	}
+}
+
 #define MAXREADERS 3
 #define MAXWRITERS 3
+#define MAXRDWR 3
 
 #ifdef CONFIG_MPMC_READERS
 #define DEFAULT_READERS (CONFIG_MPMC_READERS)
@@ -39,7 +52,13 @@ void threadB(struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> *queue)
 #define DEFAULT_WRITERS 2
 #endif
 
-int readers = DEFAULT_READERS, writers = DEFAULT_WRITERS;
+#ifdef CONFIG_MPMC_RDWR
+#define DEFAULT_RDWR (CONFIG_MPMC_RDWR)
+#else
+#define DEFAULT_RDWR 0
+#endif
+
+int readers = DEFAULT_READERS, writers = DEFAULT_WRITERS, rdwr = DEFAULT_RDWR;
 
 void print_usage()
 {
@@ -84,7 +103,7 @@ void process_params(int argc, char **argv)
 int user_main(int argc, char **argv)
 {
 	struct mpmc_boundq_1_alt<int32_t, sizeof(int32_t)> queue;
-	thrd_t A[MAXWRITERS], B[MAXREADERS];
+	thrd_t A[MAXWRITERS], B[MAXREADERS], C[MAXRDWR];
 
 	/* Note: optarg() / optind is broken in model-checker - workaround is
 	 * to just copy&paste this test a few times */
@@ -105,10 +124,15 @@ int user_main(int argc, char **argv)
 	for (int i = 0; i < readers; i++)
 		thrd_create(&B[i], (thrd_start_t)&threadB, &queue);
 
+	for (int i = 0; i < rdwr; i++)
+		thrd_create(&C[i], (thrd_start_t)&threadC, &queue);
+
 	for (int i = 0; i < writers; i++)
 		thrd_join(A[i]);
 	for (int i = 0; i < readers; i++)
 		thrd_join(B[i]);
+	for (int i = 0; i < rdwr; i++)
+		thrd_join(C[i]);
 
 	printf("Threads complete\n");
 
