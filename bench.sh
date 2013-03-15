@@ -21,14 +21,16 @@ TESTS+=" mcs-lock/mcs-lock"
 TESTS+=" spsc-queue/spsc-queue"
 TESTS+=" spsc-bugfix/spsc-queue"
 TESTS+=" dekker-fences/dekker-fences"
-TESTS+=" mpmc-queue/mpmc-2r1w"
-TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
+#TESTS+=" mpmc-queue/mpmc-2r1w"
+#TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
 TESTS+=" mpmc-queue/mpmc-queue-rdwr"
 TESTS+=" mpmc-queue/mpmc-rdwr-noinit"
-TESTS+=" mpmc-queue/mpmc-queue-noinit"
+#TESTS+=" mpmc-queue/mpmc-queue-noinit"
 TESTS+=" linuxrwlocks/linuxrwlocks"
+TESTS+=" chase-lev-deque/main"
+TESTS+=" ms-queue/main"
 
-MODEL_ARGS="-y -m 2"
+MODEL_ARGS="-y -m 2 -u 3"
 COUNT=0
 
 function run_test {
