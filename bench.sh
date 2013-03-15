@@ -16,17 +16,20 @@ BASEDIR=.
 
 DIR="${BASEDIR}/run-${DATE}"
 
-TESTS="barrier/barrier"
-TESTS+=" mcs-lock/mcs-lock"
+TESTS="chase-lev-deque/main"
 TESTS+=" spsc-queue/spsc-queue"
 TESTS+=" spsc-bugfix/spsc-queue"
-TESTS+=" dekker-fences/dekker-fences"
-TESTS+=" mpmc-queue/mpmc-2r1w"
-TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
-TESTS+=" mpmc-queue/mpmc-queue-rdwr"
+TESTS+=" barrier/barrier"
+TESTS+=" mcs-lock/mcs-lock"
 TESTS+=" mpmc-queue/mpmc-rdwr-noinit"
-TESTS+=" mpmc-queue/mpmc-queue-noinit"
+TESTS+=" ms-queue/main"
 TESTS+=" linuxrwlocks/linuxrwlocks"
+
+#TESTS+=" dekker-fences/dekker-fences"
+#TESTS+=" mpmc-queue/mpmc-2r1w"
+#TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
+#TESTS+=" mpmc-queue/mpmc-queue-rdwr"
+#TESTS+=" mpmc-queue/mpmc-queue-noinit"
 
 MODEL_ARGS="-y -m 2"
 COUNT=0
