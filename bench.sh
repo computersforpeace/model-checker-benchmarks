@@ -20,11 +20,11 @@ TESTS="chase-lev-deque/main"
 TESTS+=" spsc-queue/spsc-queue"
 TESTS+=" spsc-bugfix/spsc-queue"
 TESTS+=" barrier/barrier"
+TESTS+=" dekker-fences/dekker-fences"
 TESTS+=" mcs-lock/mcs-lock"
 TESTS+=" mpmc-queue/mpmc-queue-rdwr"
 TESTS+=" ms-queue/main"
 TESTS+=" linuxrwlocks/linuxrwlocks"
-TESTS+=" dekker-fences/dekker-fences"
 
 MODEL_ARGS="-y -m 2 -u 3"
 
