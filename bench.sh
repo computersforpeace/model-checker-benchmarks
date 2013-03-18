@@ -24,10 +24,10 @@ TESTS+=" mcs-lock/mcs-lock"
 TESTS+=" mpmc-queue/mpmc-queue-rdwr"
 TESTS+=" ms-queue/main"
 TESTS+=" linuxrwlocks/linuxrwlocks"
+TESTS+=" dekker-fences/dekker-fences"
 
 MODEL_ARGS="-y -m 2 -u 3"
 
-#TESTS+=" dekker-fences/dekker-fences"
 #TESTS+=" mpmc-queue/mpmc-2r1w"
 #TESTS+=" mpmc-queue/mpmc-1r2w-noinit"
 #TESTS+=" mpmc-queue/mpmc-queue-rdwr"
