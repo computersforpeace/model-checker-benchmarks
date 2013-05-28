@@ -13,6 +13,7 @@ typedef struct {
 
 Deque * create();
 int take(Deque *q);
+int steal(Deque *q);
 void resize(Deque *q);
 void push(Deque *q, int x);
 
