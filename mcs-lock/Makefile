@@ -5,7 +5,7 @@ TESTNAME = mcs-lock
 all: $(TESTNAME)
 
 $(TESTNAME): $(TESTNAME).cc $(TESTNAME).h
-	$(CXX) -o $@ $< $(CPPFLAGS) $(LDFLAGS)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(LDFLAGS)
 
 clean:
 	rm -f $(TESTNAME) *.o

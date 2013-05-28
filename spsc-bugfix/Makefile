@@ -6,7 +6,7 @@ RELACYNAME = spsc-relacy
 all: $(TESTNAME)
 
 $(TESTNAME): $(TESTNAME).cc queue.h eventcount.h
-	$(CXX) -o $@ $< $(CPPFLAGS) $(LDFLAGS)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(LDFLAGS)
 
 relacy: $(RELACYNAME)
 
