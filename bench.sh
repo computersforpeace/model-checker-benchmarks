@@ -59,9 +59,16 @@ function run_all_tests {
 	#run_test mpmc-queue/mpmc-queue ${MODEL_ARGS} -- -r 2 -w 2
 }
 
-cd ..
-git log --oneline -1
-cd - > /dev/null
-git log --oneline -1
-echo
+# Check if git is available, and this is a git repository
+GIT=0
+which git &> /dev/null && git rev-parse &> /dev/null && GIT=1
+
+# Print out some git information, if available
+if [ ${GIT} -ne 0 ]; then
+	cd ..
+	git log --oneline -1
+	cd - > /dev/null
+	git log --oneline -1
+	echo
+fi
 run_all_tests
