@@ -3,9 +3,6 @@
 # A (work-in-progress) test script for running our benchmarks
 # Runs all tests, with timing information
 
-## Unfinished benchmarks - do not use
-# queue williams-queue
-
 DATECMD="date +%Y-%m-%d-%R"
 DATE="`${DATECMD}`"
 
