@@ -11,15 +11,18 @@
 # default program.
 #
 
-BIN=./barrier/barrier
+# Get the directory in which this script is located
+BINDIR="${0%/*}"
+
+BIN=${BINDIR}/barrier/barrier
 PREFIX=
 
-export LD_LIBRARY_PATH=..
+export LD_LIBRARY_PATH=${BINDIR}/..
 # For Mac OSX
-export DYLD_LIBRARY_PATH=..
+export DYLD_LIBRARY_PATH=${BINDIR}/..
 
 [ $# -gt 0 ] && [ "$1" = "gdb" ] && PREFIX=gdb && shift
-[ $# -gt 0 ] && [ -x "$1" ] && [ -f "$1" ] && BIN="$1" && shift
+[ $# -gt 0 ] && [ -e "$1" ] && BIN="$1" && shift
 
-set -x
+set -xe
 $PREFIX $BIN $@
